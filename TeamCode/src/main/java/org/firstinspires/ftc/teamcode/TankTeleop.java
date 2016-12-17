@@ -68,10 +68,10 @@ public class TankTeleop extends LinearOpMode {
     private double winchDelta = .1;
     @Override
     public void runOpMode() {
-        double leftDrivePower;
-        double rightDrivePower;
-        double innerIntakePower;
-        double outerIntkaePower;
+        double left;
+        double right;
+        double spin1;
+        double spin2;
         double max;
         double max2;
         double max3;
@@ -99,11 +99,11 @@ public class TankTeleop extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            innerIntakePower = gamepad2.left_stick_y;
-            outerIntakePower = gamepad2.right_stick_y;
+            spin1 = gamepad2.left_stick_y;
+            spin2 = gamepad2.right_stick_y;
 
-            leftDrivePower  = gamepad1.left_stick_y;
-            rightDrivePower = gamepad1.right_stick_y;
+            left  = gamepad1.left_stick_y;
+            right = gamepad1.right_stick_y;
             //if (robot.device.getDigitalInputStateByte() == 1)
 
             //definining the front direction
@@ -121,12 +121,12 @@ public class TankTeleop extends LinearOpMode {
                 halfSpeed= 1;
             }
 
-            if (drift)
+            if (gamepad1.y && drift)
             {
                 robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
-            else if (!drift)
+            else if (gamepad1.y && !drift)
             {
                 robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -170,13 +170,11 @@ public class TankTeleop extends LinearOpMode {
                 right /= max;
 
             }
-            robot.flyWheelMotor1.set
+            robot.leftMotor.setPower(left*halfSpeed);
+            robot.rightMotor.setPower(right*halfSpeed);
 
-            robot.leftMotor.setPower(leftDrivePower*halfSpeed);
-            robot.rightMotor.setPower(rightDrivePower*halfSpeed);
-
-            robot.spin1Motor.setPower(innerIntakePower);
-            robot.spin2Motor.setPower(outerIntkaePower);
+            robot.spin1Motor.setPower(spin1);
+            robot.spin2Motor.setPower(spin2);
 
             robot.beaconServo.setPosition(marvinPos);
 
