@@ -178,12 +178,16 @@ public class TankAutoColour extends LinearOpMode {
         runtime.reset();
             drive(2, .25, distance(22));
         sleep(1000);
+
+        robot.flyWheelMotor1.setMaxSpeed(1120);
+        robot.flyWheelMotor2.setMaxSpeed(1120);
+
             double tempTime = runtime.seconds() + 8;
             while (runtime.seconds() < tempTime) {
                 if (runtime.seconds() < tempTime - 3) {
 
-                    robot.flyWheelMotor1.setPower(.42);
-                    robot.flyWheelMotor2.setPower(.42);
+                    robot.flyWheelMotor1.setPower(.7);
+                    robot.flyWheelMotor2.setPower(.7);
                 }
 
 
