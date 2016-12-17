@@ -68,18 +68,18 @@ public class TankTeleop extends LinearOpMode {
     private double winchDelta = .1;
     @Override
     public void runOpMode() {
-        double leftDrivePower;
-        double rightDrivePower;
-        double innerIntakePower;
-        double outerIntakePower;
-        double systemFlyPower;
+        double leftDrivePower;      //power level for left side drive train motor
+        double rightDrivePower;     //power level for right side drive train motor
+        double innerIntakePower;    //power level for the inner intake
+        double outerIntakePower;    //power level for the outer intake
+        double systemFlyPower;      //power level for the fly wheel
         double max;
         double max2;
         double max3;
         boolean direction = true; // true equals normal direction
         boolean drift = true;
-        double marvinPos = .5;
-        double halfSpeed = 1;
+        double marvinPos = .5;      //current position for the beacon servo
+        double halfSpeed = 1;       //current speed reduction coefficient.  1 at normal power.
 
         systemFlyPower = 0.7;
 
@@ -102,8 +102,8 @@ public class TankTeleop extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            innerIntakePower = gamepad2.left_stick_y;
-            outerIntakePower = gamepad2.right_stick_y;
+            innerIntakePower = gamepad2.right_stick_y;
+            outerIntakePower = gamepad2.left_stick_y;
 
             leftDrivePower  = gamepad1.left_stick_y;
             rightDrivePower = gamepad1.right_stick_y;
