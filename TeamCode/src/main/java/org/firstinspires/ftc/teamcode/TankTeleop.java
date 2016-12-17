@@ -68,10 +68,11 @@ public class TankTeleop extends LinearOpMode {
     private double winchDelta = .1;
     @Override
     public void runOpMode() {
-        double left;
-        double right;
-        double spin1;
-        double spin2;
+        double leftDrivePower;
+        double rightDrivePower;
+        double innerIntakePower;
+        double outerIntakePower;
+        double systemFlyPower;
         double max;
         double max2;
         double max3;
@@ -79,6 +80,8 @@ public class TankTeleop extends LinearOpMode {
         boolean drift = true;
         double marvinPos = .5;
         double halfSpeed = 1;
+
+        systemFlyPower = 0.7;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -91,19 +94,19 @@ public class TankTeleop extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        left  = gamepad1.left_stick_y;
-        right = gamepad1.right_stick_y;
+        leftDrivePower  = gamepad1.left_stick_y;
+        rightDrivePower = gamepad1.right_stick_y;
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            spin1 = gamepad2.left_stick_y;
-            spin2 = gamepad2.right_stick_y;
+            innerIntakePower = gamepad2.left_stick_y;
+            outerIntakePower = gamepad2.right_stick_y;
 
-            left  = gamepad1.left_stick_y;
-            right = gamepad1.right_stick_y;
+            leftDrivePower  = gamepad1.left_stick_y;
+            rightDrivePower = gamepad1.right_stick_y;
             //if (robot.device.getDigitalInputStateByte() == 1)
 
             //definining the front direction
@@ -117,6 +120,7 @@ public class TankTeleop extends LinearOpMode {
                 halfSpeed = .25;
             }
             else
+
             {
                 halfSpeed= 1;
             }
@@ -135,8 +139,8 @@ public class TankTeleop extends LinearOpMode {
             //flywheel options
             if (gamepad2.right_trigger > 0)
             {
-                robot.flyWheelMotor1.setPower(.7);
-                robot.flyWheelMotor2.setPower(.7);
+                robot.flyWheelMotor1.setPower(systemFlyPower);
+                robot.flyWheelMotor2.setPower(systemFlyPower);
             }
             else
             {
@@ -158,23 +162,23 @@ public class TankTeleop extends LinearOpMode {
             max2 = Math.max(Math.abs(spin1), Math.abs(spin2));
             if (max2 > 1.0)
             {
-                spin1 /=max2;
-                spin2 /= max2;
+                innerIntakePower /=max2;
+                outerIntakePower /= max2;
             }
 
 
             max = Math.max(Math.abs(left), Math.abs(right));
             if (max > 1.0)
             {
-                left /= max;
-                right /= max;
+                innerIntakePower /= max;
+                outerIntakePower /= max;
 
             }
-            robot.leftMotor.setPower(left*halfSpeed);
-            robot.rightMotor.setPower(right*halfSpeed);
+            robot.leftMotor.setPower(leftDrivePower*halfSpeed);
+            robot.rightMotor.setPower(rightDrivePower*halfSpeed);
 
-            robot.spin1Motor.setPower(spin1);
-            robot.spin2Motor.setPower(spin2);
+            robot.spin1Motor.setPower(innerIntakePower);
+            robot.spin2Motor.setPower(outerIntakePower);
 
             robot.beaconServo.setPosition(marvinPos);
 
