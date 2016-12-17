@@ -162,8 +162,8 @@ public class TankAutoWait extends LinearOpMode {
             drive(2, .25, distance(22));
         sleep(1000);
 
-        robot.flyWheelMotor1.setMaxSpeed(1120);
-        robot.flyWheelMotor2.setMaxSpeed(1120);
+        robot.flyWheelMotor1.setMaxSpeed(44.4);
+        robot.flyWheelMotor2.setMaxSpeed(44.4);
 
             double tempTime = runtime.seconds() + 8;
             while (runtime.seconds() < tempTime) {
