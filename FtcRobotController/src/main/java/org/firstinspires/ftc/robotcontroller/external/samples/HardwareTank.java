@@ -38,6 +38,12 @@ public class HardwareTank
     public DeviceInterfaceModule device = null;
     public final double distancePerRev = 18.84;
     public final double ticksPerInch = 53.4776;
+    public double leftDrivePower;      //power level for left side drive train motor
+    public double rightDrivePower;     //power level for right side drive train motor
+    public double innerIntakePower;    //power level for the inner intake
+    public double outerIntakePower;    //power level for the outer intake
+    public double systemFlyPower;
+    public double marvinPos = .5;
 
 
     /* Local OpMode members. */

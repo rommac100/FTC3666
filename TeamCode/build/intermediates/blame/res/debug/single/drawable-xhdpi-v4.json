@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/merged/debug/drawable-xhdpi-v4/ic_launcher.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/exploded-aar/ftc_app_masterWorking/FtcRobotController/unspecified/res/drawable-xhdpi-v4/ic_launcher.png"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/merged/debug/drawable-xhdpi-v4/icon_robotcontroller.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/exploded-aar/ftc_app_masterWorking/FtcRobotController/unspecified/res/drawable-xhdpi-v4/icon_robotcontroller.png"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/merged/debug/drawable-xhdpi-v4/icon_menu.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/exploded-aar/ftc_app_masterWorking/FtcRobotController/unspecified/res/drawable-xhdpi-v4/icon_menu.png"
+    }
+]

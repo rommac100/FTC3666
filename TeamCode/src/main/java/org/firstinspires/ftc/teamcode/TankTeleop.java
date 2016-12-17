@@ -68,20 +68,19 @@ public class TankTeleop extends LinearOpMode {
     private double winchDelta = .1;
     @Override
     public void runOpMode() {
-        double leftDrivePower;      //power level for left side drive train motor
-        double rightDrivePower;     //power level for right side drive train motor
-        double innerIntakePower;    //power level for the inner intake
-        double outerIntakePower;    //power level for the outer intake
-        double systemFlyPower;      //power level for the fly wheel
         double max;
         double max2;
-        double max3;
         boolean direction = true; // true equals normal direction
         boolean drift = true;
-        double marvinPos = .5;      //current position for the beacon servo
+        //current position for the beacon servo
         double halfSpeed = 1;       //current speed reduction coefficient.  1 at normal power.
 
-        systemFlyPower = 0.7;
+        robot.leftDrivePower = 0;
+        robot.rightDrivePower = 0;
+        robot.innerIntakePower = 0;
+        robot.outerIntakePower = 0;
+        robot.systemFlyPower = 0;
+        robot.marvinPos = .5;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -94,22 +93,22 @@ public class TankTeleop extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        leftDrivePower  = gamepad1.left_stick_y;
-        rightDrivePower = gamepad1.right_stick_y;
+        robot.leftDrivePower  = gamepad1.left_stick_y;
+        robot.rightDrivePower = gamepad1.right_stick_y;
+
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            innerIntakePower = gamepad2.right_stick_y;
-            outerIntakePower = gamepad2.left_stick_y;
+            robot.innerIntakePower = gamepad2.right_stick_y;
+            robot.outerIntakePower = gamepad2.left_stick_y;
 
-            leftDrivePower  = gamepad1.left_stick_y;
-            rightDrivePower = gamepad1.right_stick_y;
-            //if (robot.device.getDigitalInputStateByte() == 1)
+            robot.leftDrivePower  = gamepad1.left_stick_y;
+            robot.rightDrivePower = gamepad1.right_stick_y;
 
-            //definining the front direction
+            //defining slower speeds for the triggering of beacons
             if (gamepad2.left_bumper)
             {
                 halfSpeed = .5;
@@ -125,22 +124,27 @@ public class TankTeleop extends LinearOpMode {
                 halfSpeed= 1;
             }
 
+
+            //drift control
             if (gamepad1.y && drift)
             {
                 robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                drift = false;
             }
             else if (gamepad1.y && !drift)
             {
                 robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                drift = true;
             }
 
             //flywheel options
             if (gamepad2.right_trigger > 0)
             {
-                robot.flyWheelMotor1.setPower(systemFlyPower);
-                robot.flyWheelMotor2.setPower(systemFlyPower);
+                robot.flyWheelMotor1.setPower(robot.systemFlyPower);
+                robot.flyWheelMotor2.setPower(robot.systemFlyPower);
             }
             else
             {
@@ -148,43 +152,45 @@ public class TankTeleop extends LinearOpMode {
                 robot.flyWheelMotor2.setPower(0);
             }
 
+
+            //marvin servo
             if (gamepad1.left_trigger > 0)
             {
-                marvinPos = .2;
+                robot.marvinPos = .2;
             }
             else if (gamepad1.right_trigger > 0)
             {
-                marvinPos =.9;
+                robot.marvinPos =.9;
             }
 
             // Normalize the values so neither exceed +/- 1.0
            // max = Math.max(Math.abs(left), Math.abs(right));
-            max2 = Math.max(Math.abs(spin1), Math.abs(spin2));
+            max2 = Math.max(Math.abs(robot.innerIntakePower), Math.abs(robot.outerIntakePower));
             if (max2 > 1.0)
             {
-                innerIntakePower /=max2;
-                outerIntakePower /= max2;
+                robot.innerIntakePower /=max2;
+                robot.outerIntakePower /= max2;
             }
 
 
-            max = Math.max(Math.abs(left), Math.abs(right));
+            max = Math.max(Math.abs(robot.leftDrivePower), Math.abs(robot.rightDrivePower));
             if (max > 1.0)
             {
-                innerIntakePower /= max;
-                outerIntakePower /= max;
+                robot.innerIntakePower /= max;
+                robot.outerIntakePower /= max;
 
             }
-            robot.leftMotor.setPower(leftDrivePower*halfSpeed);
-            robot.rightMotor.setPower(rightDrivePower*halfSpeed);
+            robot.leftMotor.setPower(robot.leftDrivePower*halfSpeed);
+            robot.rightMotor.setPower(robot.rightDrivePower*halfSpeed);
 
-            robot.spin1Motor.setPower(innerIntakePower);
-            robot.spin2Motor.setPower(outerIntakePower);
+            robot.spin1Motor.setPower(robot.innerIntakePower);
+            robot.spin2Motor.setPower(robot.outerIntakePower);
 
-            robot.beaconServo.setPosition(marvinPos);
+            robot.beaconServo.setPosition(robot.marvinPos);
 
             // Send telemetry message to signify robot running;
-            telemetry.addData("left",  "%.2f", left);
-            telemetry.addData("right", "%.2f", right);
+            telemetry.addData("left",  "%.2f", robot.leftDrivePower);
+            telemetry.addData("right", "%.2f", robot.rightDrivePower);
             telemetry.addData("beaconServo" , "", robot.beaconServo.getPosition());
             telemetry.addData("FlyWheel2",  "power", robot.flyWheelMotor2.getPower());
             telemetry.addData("flyWheel1", "power", robot.flyWheelMotor1.getPower());
