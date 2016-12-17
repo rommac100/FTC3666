@@ -96,8 +96,12 @@ public class TankTeleop extends LinearOpMode {
         robot.leftDrivePower  = gamepad1.left_stick_y;
         robot.rightDrivePower = gamepad1.right_stick_y;
 
+
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.flyWheelMotor1.setMaxSpeed(1120);
+        robot.flyWheelMotor2.setMaxSpeed(1120);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
