@@ -79,7 +79,7 @@ public class TankTeleop extends LinearOpMode {
         robot.rightDrivePower = 0;
         robot.innerIntakePower = 0;
         robot.outerIntakePower = 0;
-        robot.systemFlyPower = 0;
+        robot.systemFlyPower = robot.defaultFlyPower;
         robot.marvinPos = .5;
 
         /* Initialize the hardware variables.

@@ -44,6 +44,7 @@ public class HardwareTank
     public double outerIntakePower;    //power level for the outer intake
     public double systemFlyPower;
     public double marvinPos = .5;
+    public double defaultFlyPower = 0.7;
 
 
     /* Local OpMode members. */
