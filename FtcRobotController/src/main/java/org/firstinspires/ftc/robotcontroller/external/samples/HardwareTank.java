@@ -75,6 +75,7 @@ public class HardwareTank
         spin2Motor.setDirection(DcMotor.Direction.REVERSE);
         flyWheelMotor1.setDirection(DcMotor.Direction.REVERSE);
         beaconServo = hwMap.servo.get("beaconS");
+        device = hwMap.deviceInterfaceModule.get("deviceINT");
 
         // Set all motors to zero power
         leftMotor.setPower(0);

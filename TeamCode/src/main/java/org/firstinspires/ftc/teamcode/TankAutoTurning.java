@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
@@ -66,6 +67,13 @@ public class TankAutoTurning extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareTank robot   = new HardwareTank();
     private ElapsedTime     runtime = new ElapsedTime();
+
+    //adafruit Gyro address
+    public static final int ADDRESS_ADAFRUIT_GYRO = 0x6;
+
+    public static final I2cAddr I2c_ADDRESS_ADAFRUIT_GYRO = I2cAddr.create7bit(ADDRESS_ADAFRUIT_GYRO);
+
+    int port =1;
 
     public int distance(double dis)
     {
@@ -181,11 +189,11 @@ public class TankAutoTurning extends LinearOpMode {
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
-            drive(2, .25, distance(22));
+
+        /*
+        drive(2, .25, distance(22));
         sleep(1000);
 
-        robot.flyWheelMotor1.setMaxSpeed(44.4);
-        robot.flyWheelMotor2.setMaxSpeed(44.4);
 
             double tempTime = runtime.seconds() + 8;
             while (runtime.seconds() < tempTime) {
@@ -206,7 +214,7 @@ public class TankAutoTurning extends LinearOpMode {
             robot.flyWheelMotor2.setPower(0);
 
             turningDrive(-.5, distance(100));
-
+*/
             //runtime.reset();
             //sleep(2000);
             //drive(2, 1, distance(35));

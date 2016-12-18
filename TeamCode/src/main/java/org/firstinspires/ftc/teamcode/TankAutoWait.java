@@ -36,6 +36,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.util.TypeConversion;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
@@ -65,6 +68,8 @@ public class TankAutoWait extends LinearOpMode {
 
     /* Declare OpMode members. */
     HardwareTank robot   = new HardwareTank();
+
+
     private ElapsedTime     runtime = new ElapsedTime();
 
     public int distance(double dis)
@@ -161,9 +166,6 @@ public class TankAutoWait extends LinearOpMode {
         runtime.reset();
             drive(2, .25, distance(22));
         sleep(1000);
-
-        robot.flyWheelMotor1.setMaxSpeed(44.4);
-        robot.flyWheelMotor2.setMaxSpeed(44.4);
 
             double tempTime = runtime.seconds() + 8;
             while (runtime.seconds() < tempTime) {
