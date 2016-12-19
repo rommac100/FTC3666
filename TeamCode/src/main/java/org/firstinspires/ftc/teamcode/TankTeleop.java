@@ -115,23 +115,23 @@ public class TankTeleop extends LinearOpMode {
 
             if(gamepad2.dpad_down)
             {
-                robot.liveFlyPower -= .05;
+                robot.liveFlyPowerSetting -= .05;
             }
             else if(gamepad2.dpad_up)
             {
-                robot.liveFlyPower += 0.01;
+                robot.liveFlyPowerSetting += 0.01;
             }
             else if(gamepad2.dpad_right)
             {
-                robot.liveFlyPower = robot.defaultFlyPower;
+                robot.liveFlyPowerSetting = robot.defaultFlyPower;
             }
             else if(gamepad2.dpad_left&&gamepad2.dpad_up)
             {
-                robot.liveFlyPower = robot.defaultFlyPower+0.2;
+                robot.liveFlyPowerSetting = robot.defaultFlyPower+0.2;
             }
             else if(gamepad2.dpad_left&&gamepad2.dpad_down)
             {
-                robot.liveFlyPower = robot.defaultFlyPower-0.2;
+                robot.liveFlyPowerSetting = robot.defaultFlyPower-0.2;
             }
 
 
