@@ -82,6 +82,7 @@ public class TankTeleop extends LinearOpMode {
         robot.systemFlyPower = robot.defaultFlyPower;
         robot.marvinPos = .5;
 
+
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
@@ -109,6 +110,30 @@ public class TankTeleop extends LinearOpMode {
 
             robot.leftDrivePower  = gamepad1.left_stick_y;
             robot.rightDrivePower = gamepad1.right_stick_y;
+
+
+
+            if(gamepad2.dpad_down)
+            {
+                robot.liveFlyPower -= .05;
+            }
+            else if(gamepad2.dpad_up)
+            {
+                robot.liveFlyPower += 0.01;
+            }
+            else if(gamepad2.dpad_right)
+            {
+                robot.liveFlyPower = robot.defaultFlyPower;
+            }
+            else if(gamepad2.dpad_left&&gamepad2.dpad_up)
+            {
+                robot.liveFlyPower = robot.defaultFlyPower+0.2;
+            }
+            else if(gamepad2.dpad_left&&gamepad2.dpad_down)
+            {
+                robot.liveFlyPower = robot.defaultFlyPower-0.2;
+            }
+
 
             //defining slower speeds for the triggering of beacons
             if (gamepad2.left_bumper)

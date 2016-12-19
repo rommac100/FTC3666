@@ -45,6 +45,7 @@ public class HardwareTank
     public double systemFlyPower;
     public double marvinPos = .5;
     public double defaultFlyPower = 0.7;
+    public double liveFlyPower = defaultFlyPower;
 
 
     /* Local OpMode members. */
