@@ -44,19 +44,8 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
-/**
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
- * All device access is managed through the HardwarePushbot class.
- * The code is structured as a LinearOpMode
- *
- * This particular OpMode executes a POV Game style Teleop for a PushBot
- * In this mode the left stick moves the robot FWD and back, th e Right stick turns left and right.
- * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+
+
 
 @TeleOp(name="Tank: Teleop", group="Tank")
 public class TankTeleop extends LinearOpMode {
@@ -101,6 +90,9 @@ public class TankTeleop extends LinearOpMode {
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        robot.linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -110,6 +102,39 @@ public class TankTeleop extends LinearOpMode {
 
             robot.leftDrivePower  = gamepad1.left_stick_y;
             robot.rightDrivePower = gamepad1.right_stick_y;
+
+
+            if(gamepad2.y)
+            {
+                if(robot.linearSlide.getCurrentPosition() < robot.maxSlideHeight)
+                {
+                    robot.linearSlidePower = 0.15;
+                }
+            }
+            else if(gamepad2.a)
+            {
+                if(robot.linearSlide.getCurrentPosition() > 0 )
+                {
+                    robot.linearSlidePower = -0.15;
+                }
+            }
+
+            /*
+            //this part is kinda sketch
+            else if(gamepad2.x)
+            {
+                robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.linearSlide.setTargetPosition(0);
+            }
+            if(robot.linearSlide.getMode() = "RUN_TO_POSITION")
+            {
+                if(!robot.linearSlide.isBusy())
+                {
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
+            }
+            //end sketchiness
+            */
 
 
 
@@ -125,11 +150,11 @@ public class TankTeleop extends LinearOpMode {
             {
                 robot.liveFlyPowerSetting = robot.defaultFlyPower;
             }
-            else if(gamepad2.dpad_left&&gamepad2.dpad_up)
+            else if(gamepad2.dpad_right&&gamepad2.dpad_up)
             {
                 robot.liveFlyPowerSetting = robot.defaultFlyPower+0.2;
             }
-            else if(gamepad2.dpad_left&&gamepad2.dpad_down)
+            else if(gamepad2.dpad_right&&gamepad2.dpad_down)
             {
                 robot.liveFlyPowerSetting = robot.defaultFlyPower-0.2;
             }
@@ -141,7 +166,7 @@ public class TankTeleop extends LinearOpMode {
                 halfSpeed = .5;
             }
 
-            else if (gamepad2.left_trigger == 1)
+            else if (gamepad2.left_trigger > 0.25)
             {
                 halfSpeed = .25;
             }
@@ -219,6 +244,7 @@ public class TankTeleop extends LinearOpMode {
             telemetry.addData("left",  "%.2f", robot.leftDrivePower);
             telemetry.addData("right", "%.2f", robot.rightDrivePower);
             telemetry.addData("beaconServo" , "", robot.beaconServo.getPosition());
+            telemetry.addData("liveFly","",robot.liveFlyPowerSetting);
             telemetry.addData("FlyWheel2",  "power", robot.flyWheelMotor2.getPower());
             telemetry.addData("flyWheel1", "power", robot.flyWheelMotor1.getPower());
             telemetry.addData("spin1Motor", "power", robot.spin1Motor.getPower());

@@ -30,6 +30,7 @@ public class HardwareTank
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
+    public DcMotor  linearSlide = null;
     public DcMotor  spin1Motor = null;
     public DcMotor  spin2Motor = null;
     public DcMotor  flyWheelMotor1 = null;
@@ -45,7 +46,10 @@ public class HardwareTank
     public double systemFlyPower;       //current power level for fly motors
     public double marvinPos = .5;
     public double defaultFlyPower = 0.7;
+    public double linearSlidePower;
     public double liveFlyPowerSetting = defaultFlyPower;
+    public int maxSlideHeight = 1000;   //In theory this is low eneugh of a end height that we will have no problems in the short run, and can fine tune further from here.
+                                        //should be less than one rotation right?
 
 
     /* Local OpMode members. */
@@ -62,6 +66,7 @@ public class HardwareTank
         hwMap = ahwMap;
 
         // Define and Initialize Motors
+        linearSlide = hwMap.dcMotor.get("slide_Motor");
         leftMotor   = hwMap.dcMotor.get("left_drive");
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor  = hwMap.dcMotor.get("right_drive");
