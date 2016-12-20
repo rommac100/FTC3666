@@ -42,26 +42,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
-/**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+
 
 @Autonomous(name="Tank: Autotomous", group="Tank")
 public class TankAuto extends LinearOpMode {
@@ -160,23 +141,28 @@ public class TankAuto extends LinearOpMode {
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
-            drive(2, .25, distance(22));
+
+        drive(2, .25, distance(22));
+
         sleep(1000);
 
 
-            double tempTime = runtime.seconds() + 8;
-            while (runtime.seconds() < tempTime) {
-                if (runtime.seconds() < tempTime - 3) {
+        double tempTime = runtime.seconds() + 8;
 
-                    robot.flyWheelMotor1.setPower(0.7);
-                    robot.flyWheelMotor2.setPower(0.7);
-                }
+        while (runtime.seconds() < tempTime)
+        {
+            if (runtime.seconds() < tempTime - 3)
+            {
 
-
-
-                //robot.spin1Motor.setPower(.8);
-                robot.spin2Motor.setPower(.4);
+                robot.flyWheelMotor1.setPower(0.7);
+                robot.flyWheelMotor2.setPower(0.7);
             }
+
+
+
+            //robot.spin1Motor.setPower(.8);
+            robot.spin2Motor.setPower(.4);
+        }
             robot.spin1Motor.setPower(0);
             robot.spin2Motor.setPower(0);
             robot.flyWheelMotor1.setPower(0);
@@ -187,7 +173,6 @@ public class TankAuto extends LinearOpMode {
             //drive(2, 1, distance(35));
 
 
-            // Step 4:  Stop and close the claw
 
 
             telemetry.addData("Path", "Complete");

@@ -90,8 +90,9 @@ public class TankTeleop extends LinearOpMode {
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         // run until the end of the match (driver presses STOP)
