@@ -151,17 +151,13 @@ public class TankAuto extends LinearOpMode {
 
         while (runtime.seconds() < tempTime)
         {
-            if (runtime.seconds() < tempTime - 3)
+            robot.flyWheelMotor1.setPower(0.7);
+            robot.flyWheelMotor2.setPower(0.7);
+
+            if (runtime.seconds() > tempTime + 3)
             {
-
-                robot.flyWheelMotor1.setPower(0.7);
-                robot.flyWheelMotor2.setPower(0.7);
+                robot.spin2Motor.setPower(.4);
             }
-
-
-
-            //robot.spin1Motor.setPower(.8);
-            robot.spin2Motor.setPower(.4);
         }
             robot.spin1Motor.setPower(0);
             robot.spin2Motor.setPower(0);
