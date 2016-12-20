@@ -165,34 +165,32 @@ public class TankAutoWaitCapBall extends LinearOpMode {
         sleep(1000);
 
             double tempTime = runtime.seconds() + 8;
-            while (runtime.seconds() < tempTime) {
-                if (runtime.seconds() < tempTime - 3) {
+        while (runtime.seconds() < tempTime)
+        {
+            robot.flyWheelMotor1.setPower(0.7);
+            robot.flyWheelMotor2.setPower(0.7);
 
-                    robot.flyWheelMotor1.setPower(.7);
-                    robot.flyWheelMotor2.setPower(.7);
-                }
-
-
-
-                //robot.spin1Motor.setPower(.8);
+            if (runtime.seconds() > tempTime +3)
+            {
                 robot.spin2Motor.setPower(.4);
             }
-            robot.spin1Motor.setPower(0);
-            robot.spin2Motor.setPower(0);
-            robot.flyWheelMotor1.setPower(0);
-            robot.flyWheelMotor2.setPower(0);
+        }
+        robot.spin1Motor.setPower(0);
+        robot.spin2Motor.setPower(0);
+        robot.flyWheelMotor1.setPower(0);
+        robot.flyWheelMotor2.setPower(0);
 
-            //sleep(2000);
-            drive(2, 1, distance(35));
-
-
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
-            // Step 4:  Stop and close the claw
+        //sleep(2000);
+        drive(2, 1, distance(35));
 
 
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            //sleep(1000);
+        robot.leftMotor.setPower(0);
+        robot.rightMotor.setPower(0);
+        // Step 4:  Stop and close the claw
+
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        //sleep(1000);
     }
 }

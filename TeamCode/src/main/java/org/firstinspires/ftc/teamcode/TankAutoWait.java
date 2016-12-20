@@ -167,34 +167,26 @@ public class TankAutoWait extends LinearOpMode {
             drive(2, .25, distance(22));
         sleep(1000);
 
-            double tempTime = runtime.seconds() + 8;
-            while (runtime.seconds() < tempTime) {
-                if (runtime.seconds() < tempTime - 3) {
+        double tempTime = runtime.seconds() + 8;
+        while (runtime.seconds() < tempTime)
+        {
+            robot.flyWheelMotor1.setPower(0.7);
+            robot.flyWheelMotor2.setPower(0.7);
 
-                    robot.flyWheelMotor1.setPower(.7);
-                    robot.flyWheelMotor2.setPower(.7);
-                }
-
-
-
-                //robot.spin1Motor.setPower(.8);
+            if (runtime.seconds() > tempTime +3)
+            {
                 robot.spin2Motor.setPower(.4);
             }
-            robot.spin1Motor.setPower(0);
-            robot.spin2Motor.setPower(0);
-            robot.flyWheelMotor1.setPower(0);
-            robot.flyWheelMotor2.setPower(0);
-
-            //runtime.reset();
-            //sleep(2000);
-            //drive(2, 1, distance(35));
+        }
+        robot.spin1Motor.setPower(0);
+        robot.spin2Motor.setPower(0);
+        robot.flyWheelMotor1.setPower(0);
+        robot.flyWheelMotor2.setPower(0);
 
 
-            // Step 4:  Stop and close the claw
 
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            //sleep(1000);
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        //sleep(1000);
     }
 }
