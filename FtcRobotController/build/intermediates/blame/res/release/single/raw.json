@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/chimeconnect.wav",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/raw/chimeconnect.wav"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/cube_mesh_vertex_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/cube_mesh_vertex_shader.glsl"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/simple_vertex_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/simple_vertex_shader.glsl"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/warningmessage.wav",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/raw/warningmessage.wav"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/color_fragment_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/color_fragment_shader.glsl"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/chimedisconnect.wav",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/raw/chimedisconnect.wav"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/texture_fragment_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/texture_fragment_shader.glsl"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/errormessage.wav",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/raw/errormessage.wav"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/cube_mesh_fragment_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/cube_mesh_fragment_shader.glsl"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/nxtstartupsound.wav",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/raw/nxtstartupsound.wav"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/raw/texture_vertex_shader.glsl",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/RobotCore-release/res/raw/texture_vertex_shader.glsl"
+    }
+]

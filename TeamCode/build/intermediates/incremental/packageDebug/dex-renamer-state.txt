@@ -1,0 +1,7 @@
+#Tue Dec 20 14:50:52 MST 2016
+base.0=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_1a0ab18d0803105a5a0264d8cb66a1b2dfa92e39
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_636f882e15aafbdf77b5465b01dadbf1793ef14e/classes.dex
+base.1=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_636f882e15aafbdf77b5465b01dadbf1793ef14e
+file.0=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_1a0ab18d0803105a5a0264d8cb66a1b2dfa92e39/classes.dex

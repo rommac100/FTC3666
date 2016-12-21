@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/drawable-hdpi-v4/button_shape.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/drawable-hdpi-v4/button_shape.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/release/drawable-hdpi-v4/ic_launcher.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/drawable-hdpi/ic_launcher.png"
+    }
+]

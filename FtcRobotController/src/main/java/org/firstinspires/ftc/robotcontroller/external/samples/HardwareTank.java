@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -66,7 +67,7 @@ public class HardwareTank
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        linearSlide = hwMap.dcMotor.get("slide_Motor");
+        linearSlide = hwMap.dcMotor.get("linear_slide");
         leftMotor   = hwMap.dcMotor.get("left_drive");
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor  = hwMap.dcMotor.get("right_drive");
@@ -109,6 +110,62 @@ public class HardwareTank
      *
      * @param periodMs  Length of wait cycle in mSec.
      */
+
+    public void drive(int direction, double power, int ticks, ElapsedTime runtime, LinearOpMode linear)
+    {
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftMotor.setTargetPosition(ticks);
+        rightMotor.setTargetPosition(ticks);
+        double timeTemp = runtime.seconds()+10;
+        switch (direction)
+        {
+            case 0:
+                leftMotor.setPower(power);
+                rightMotor.setPower(power);
+                while(leftMotor.isBusy() && rightMotor.isBusy())
+                {
+
+                }
+                leftMotor.setPower(0);
+                rightMotor.setPower(0);
+
+                leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                break;
+            case 1:
+                leftMotor.setPower(power);
+                rightMotor.setPower(-1*power);
+                break;
+            case 2:
+                leftMotor.setPower(-1*power);
+                rightMotor.setPower(-1*power);
+                while(leftMotor.isBusy() && rightMotor.isBusy() && linear.opModeIsActive() && runtime.seconds() < timeTemp)
+                {
+
+                }
+
+                leftMotor.setPower(0);
+                rightMotor.setPower(0);
+
+                leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
+            case 3:
+                leftMotor.setPower(-1*power);
+                leftMotor.setPower(1*power);
+                break;
+
+
+        }
+    }
+
     public void waitForTick(long periodMs) {
 
         long  remaining = periodMs - (long)period.milliseconds();

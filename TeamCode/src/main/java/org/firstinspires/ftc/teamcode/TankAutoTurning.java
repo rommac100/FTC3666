@@ -88,6 +88,9 @@ public class TankAutoTurning extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
 
+    boolean firstAngle = true;
+    boolean secondAngle = true;
+
     public int distance(double dis)
     {
         return (int)(dis*robot.ticksPerInch);
@@ -105,6 +108,7 @@ public class TankAutoTurning extends LinearOpMode {
 
         robot.leftMotor.setTargetPosition(ticks);
         robot.rightMotor.setTargetPosition(ticks);
+        double timeTemp = runtime.seconds()+10;
         switch (direction)
         {
             case 0:
@@ -127,7 +131,7 @@ public class TankAutoTurning extends LinearOpMode {
             case 2:
                 robot.leftMotor.setPower(-1*power);
                 robot.rightMotor.setPower(-1*power);
-                while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive() && runtime.seconds() < 10.0)
+                while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive() && runtime.seconds() < timeTemp)
                 {
                     telemetry.addData("motorLeft Pos", robot.leftMotor.getCurrentPosition());
                     telemetry.update();
@@ -150,28 +154,54 @@ public class TankAutoTurning extends LinearOpMode {
         }
     }
 
-    public void turningDrive(double power, int ticks)
+    public void turningDrive(double power, int angle)
     {
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.leftMotor.setTargetPosition(ticks);
-        robot.rightMotor.setTargetPosition(ticks);
 
-        robot.leftMotor.setPower(-power);
-        robot.rightMotor.setPower(power);
 
-        while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+        float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+angle;
+
+        if (angle < 0) {
+            robot.leftDrivePower = -power;
+            robot.rightDrivePower = power;
+            while (opModeIsActive()) {
+
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                }
+                robot.leftMotor.setPower(robot.leftDrivePower);
+                robot.rightMotor.setPower(robot.rightDrivePower);
+                if (robot.leftDrivePower == 0) {
+                    break;
+                }
+            }
+        }
+        else
         {
+            robot.leftDrivePower = power;
+            robot.rightDrivePower = -power;
+            while (opModeIsActive() &&  AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
+            {
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
+                {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                }
+                robot.leftMotor.setPower(robot.leftDrivePower);
+                robot.rightMotor.setPower(robot.rightDrivePower);
 
+                if (robot.leftDrivePower == 0)
+                {
+                    break;
+                }
+
+            }
         }
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.leftMotor.setPower(0);
-        robot.rightMotor.setPower(0);
-
-
-        
     }
 
     @Override
@@ -213,23 +243,42 @@ public class TankAutoTurning extends LinearOpMode {
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
-        sleep(2000);
+        composeTelemetry();
 
-        robot.leftMotor.setPower(.25);
-        robot.rightMotor.setPower(-.25);
 
-        float angleDesired = angles.firstAngle+90;
-        while(angles.firstAngle != angleDesired && opModeIsActive())
-        {
+
+        //telemetry.addData("Angle",angleDesired);
+
+
+        if (opModeIsActive()) {
+            //sleep(2000);
+
+            drive(2, .25, distance(22));
+            sleep(1000);
+            float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle+30);
+            telemetry.addData("Angle", angleDesired);
+            robot.leftDrivePower = -.25;
+            robot.rightDrivePower = .25;
+            while (opModeIsActive()) {
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                }
+
+                robot.rightMotor.setPower(robot.rightDrivePower);
+                robot.leftMotor.setPower(robot.leftDrivePower);
+                if (robot.leftDrivePower == 0)
+                {
+                    break;
+                }
+            }
+
+
 
         }
-        robot.rightMotor.setPower(0);
-        robot.leftMotor.setPower(0);
 
 
 
-
-        telemetry.update();
 
         /*
         drive(2, .25, distance(22));

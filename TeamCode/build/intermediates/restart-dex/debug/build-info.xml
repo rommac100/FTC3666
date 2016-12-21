@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="armeabi-v7a,armeabi"
+    api-level="23"
+    density="xhdpi"
+    format="8"
+    plugin-version="2.2.1"
+    timestamp="799384633223"
+    token="-3873937447771692441"
+    verifier="COLD_SWAP_REQUESTED" >
+
+    <task
+        name="javac"
+        duration="161" />
+    <task
+        name="instant-run-dex"
+        duration="0" />
+    <task
+        name="instant-run-transform"
+        duration="36" />
+    <task
+        name="verifier"
+        duration="1" />
+
+    <artifact
+        location="/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/5/slice_2/classes.dex"
+        type="DEX" />
+
+    <build
+        timestamp="677168369894"
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/outputs/apk/TeamCode-debug.apk"
+            type="MAIN" />
+    </build>
+    <build
+        timestamp="799384633223"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/transforms/dex/debug/folders/1000/5/slice_2/classes.dex"
+            type="DEX" />
+    </build>
+    <build
+        timestamp="9449847309454"
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/outputs/apk/TeamCode-debug.apk"
+            type="MAIN" />
+    </build>
+
+</instant-run>
