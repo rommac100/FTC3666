@@ -154,19 +154,55 @@ public class TankAutoTurning extends LinearOpMode {
         }
     }
 
+    public boolean turningDriveBoolean(double power, int angle, float angleDesired)
+    {
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        boolean temp = false;
+
+        if (angle < 0)
+        {
+            robot.leftDrivePower = power;
+            robot.rightDrivePower = -power;
+
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired)
+            {
+                robot.leftDrivePower = 0;
+                robot.rightDrivePower = 0;
+
+                temp = true;
+
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+        else if (angle > 0)
+        {
+            robot.leftDrivePower = -power;
+            robot.rightDrivePower = power;
+
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
+            {
+             robot.leftDrivePower = 0;
+                robot.rightDrivePower =0;
+                temp = true;
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+        return temp;
+    }
+
     public void turningDrive(double power, int angle)
     {
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-
         float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+angle;
-
         if (angle < 0) {
-            robot.leftDrivePower = -power;
-            robot.rightDrivePower = power;
-            while (opModeIsActive()) {
+            robot.leftDrivePower = power;
+            robot.rightDrivePower = -power;
+            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
 
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
                     robot.leftDrivePower = 0;
@@ -177,13 +213,14 @@ public class TankAutoTurning extends LinearOpMode {
                 if (robot.leftDrivePower == 0) {
                     break;
                 }
+                telemetry.update();
             }
         }
         else
         {
-            robot.leftDrivePower = power;
-            robot.rightDrivePower = -power;
-            while (opModeIsActive() &&  AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
+            robot.leftDrivePower = -power;
+            robot.rightDrivePower = power;
+            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
             {
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
                 {
@@ -197,6 +234,7 @@ public class TankAutoTurning extends LinearOpMode {
                 {
                     break;
                 }
+                telemetry.update();
 
             }
         }
@@ -234,6 +272,12 @@ public class TankAutoTurning extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
+        boolean firstTurn = false;
+        boolean secondTurn = true;
+        boolean firstMove = false;
+        boolean secondMove = true;
+        boolean flyWheel = true;
+        double tempTime = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
@@ -248,34 +292,102 @@ public class TankAutoTurning extends LinearOpMode {
 
 
         //telemetry.addData("Angle",angleDesired);
+        robot.leftDrivePower = -.1;
+        robot.rightDrivePower = .1;
+
+        float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)-45;
+        float angleDesired2 = angleDesired-45;
 
 
-        if (opModeIsActive()) {
+        while (opModeIsActive()) {
             //sleep(2000);
+            //sleep(1000);
 
-            drive(2, .25, distance(22));
-            sleep(1000);
-            float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle+30);
-            telemetry.addData("Angle", angleDesired);
-            robot.leftDrivePower = -.25;
-            robot.rightDrivePower = .25;
-            while (opModeIsActive()) {
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                }
 
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                robot.leftMotor.setPower(robot.leftDrivePower);
-                if (robot.leftDrivePower == 0)
-                {
-                    break;
-                }
+            if (turningDriveBoolean(.1, 30, angleDesired) == firstTurn)
+            {
+
+            }
+            else{
+                firstTurn = true;
             }
 
 
 
-        }
+
+            //turningDrive(.1, 90);
+            //telemetry.addData("Angle", angleDesired);
+/*
+            if (!firstMove)
+            {
+                drive(2, .25, distance(22));
+                flyWheel = false;
+                firstMove = true;
+
+            }
+            else if (!flyWheel)
+            {
+                if (tempTime == 0)
+                {
+                    tempTime = runtime.seconds() + 8;
+                }
+
+                if (runtime.seconds() < tempTime)
+                {
+                    robot.flyWheelMotor1.setPower(0.7);
+                    robot.flyWheelMotor2.setPower(0.7);
+
+                    if (runtime.seconds() > tempTime + 3)
+                    {
+                        robot.spin2Motor.setPower(.4);
+                    }
+                }
+                robot.spin1Motor.setPower(0);
+                robot.spin2Motor.setPower(0);
+                robot.flyWheelMotor1.setPower(0);
+                robot.flyWheelMotor2.setPower(0);
+                firstTurn = false;
+                flyWheel = true;
+            }
+            else if (!firstTurn) {
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                    secondMove = false;
+                    firstTurn = true;
+                }
+
+                robot.rightMotor.setPower(robot.rightDrivePower);
+                robot.leftMotor.setPower(robot.leftDrivePower);
+            }
+            */
+            /*
+            else if (!secondMove)
+            {
+                drive(2, .25, distance(22));
+                secondTurn =false;
+                secondMove = true;
+            }
+            else if (!secondTurn)
+            {
+                robot.leftDrivePower = .1;
+                robot.rightDrivePower = -.1;
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired2) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                    secondTurn = true;
+                }
+                robot.rightMotor.setPower(robot.rightDrivePower);
+                robot.leftMotor.setPower(robot.leftDrivePower);
+
+            }
+            */
+            telemetry.update();
+            }
+
+
+
+
 
 
 
@@ -313,8 +425,7 @@ public class TankAutoTurning extends LinearOpMode {
             // Step 4:  Stop and close the claw
 
 
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
+
             //sleep(1000);
     }
     void composeTelemetry() {
