@@ -77,15 +77,12 @@ function fetchToolboxViaFile(callback) {
       '<block type="linearOpMode_waitForStart"></block>' +
       '<block type="linearOpMode_idle"></block>' +
       '<block type="linearOpMode_sleep">' +
-      '<value name="MILLISECONDS">' +
-      '<block type="math_number">' +
-      '<field name="NUM">1000</field>' +
-      '</block>' +
-      '</value>' +
+      '  <value name="MILLISECONDS"><shadow type="math_number"><field name="NUM">1000</field></shadow></value>' +
       '</block>' +
       '<block type="linearOpMode_opModeIsActive"></block>' +
       '<block type="linearOpMode_isStarted"></block>' +
       '<block type="linearOpMode_isStopRequested"></block>' +
+      '<block type="linearOpMode_getRuntime"></block>' +
       '</category>' +
       '<category name="Miscellaneous" colour="200">' +
       '<block type="comment">' +

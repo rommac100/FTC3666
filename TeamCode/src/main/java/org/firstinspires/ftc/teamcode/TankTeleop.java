@@ -48,13 +48,13 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
 
 @TeleOp(name="Tank: Teleop", group="Tank")
+@Disabled
 public class TankTeleop extends LinearOpMode {
 
     /* Declare OpMode members. */
     HardwareTank robot           = new HardwareTank();   // Use a Pushbot's hardware
                                                                // could also use HardwarePushbotMatrix class.
                      // sets rate to move servo
-    private double winchDelta = .1;
     @Override
     public void runOpMode() {
         double max;
@@ -216,8 +216,7 @@ public class TankTeleop extends LinearOpMode {
                 robot.marvinPos =.9;
             }
 
-            // Normalize the values so neither exceed +/- 1.0
-           // max = Math.max(Math.abs(left), Math.abs(right));
+
             max2 = Math.max(Math.abs(robot.innerIntakePower), Math.abs(robot.outerIntakePower));
             if (max2 > 1.0)
             {
@@ -229,8 +228,8 @@ public class TankTeleop extends LinearOpMode {
             max = Math.max(Math.abs(robot.leftDrivePower), Math.abs(robot.rightDrivePower));
             if (max > 1.0)
             {
-                robot.innerIntakePower /= max;
-                robot.outerIntakePower /= max;
+                robot.leftDrivePower /= max;
+                robot.rightDrivePower /= max;
 
             }
             robot.leftMotor.setPower(robot.leftDrivePower*halfSpeed);

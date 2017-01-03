@@ -202,7 +202,7 @@ public class TankAutoTurning extends LinearOpMode {
         if (angle < 0) {
             robot.leftDrivePower = power;
             robot.rightDrivePower = -power;
-            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
+
 
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
                     robot.leftDrivePower = 0;
@@ -210,18 +210,15 @@ public class TankAutoTurning extends LinearOpMode {
                 }
                 robot.leftMotor.setPower(robot.leftDrivePower);
                 robot.rightMotor.setPower(robot.rightDrivePower);
-                if (robot.leftDrivePower == 0) {
-                    break;
-                }
+
                 telemetry.update();
             }
-        }
+
         else
         {
             robot.leftDrivePower = -power;
             robot.rightDrivePower = power;
-            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
-            {
+
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
                 {
                     robot.leftDrivePower = 0;
@@ -229,14 +226,9 @@ public class TankAutoTurning extends LinearOpMode {
                 }
                 robot.leftMotor.setPower(robot.leftDrivePower);
                 robot.rightMotor.setPower(robot.rightDrivePower);
-
-                if (robot.leftDrivePower == 0)
-                {
-                    break;
-                }
                 telemetry.update();
 
-            }
+
         }
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -272,11 +264,6 @@ public class TankAutoTurning extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        boolean firstTurn = false;
-        boolean secondTurn = true;
-        boolean firstMove = false;
-        boolean secondMove = true;
-        boolean flyWheel = true;
         double tempTime = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -303,14 +290,43 @@ public class TankAutoTurning extends LinearOpMode {
             //sleep(2000);
             //sleep(1000);
 
-
-            if (turningDriveBoolean(.1, 30, angleDesired) == firstTurn)
+            //first conditional is relating to the inital movement
+            if (runtime.seconds() < 5) {
+                drive(2, .25, distance(22));
+            }
+            //second conditional is relating to the firing of the particles
+            else if (runtime.seconds() < 12)
             {
+                if (runtime.seconds() > 7)
+                {
+                    robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
+                    robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
+                }
+                else if (runtime.seconds() < 11)
+                {
+                    robot.spin2Motor.setPower(.4);
+                }
+                else if (runtime.seconds() >= 11)
+                {
+                    robot.spin2Motor.setPower(0);
+                    robot.flyWheelMotor1.setPower(0);
+                    robot.flyWheelMotor2.setPower(0);
+                }
 
             }
-            else{
-                firstTurn = true;
+            else if (runtime.seconds() < 15)
+            {
+                turningDrive(.1, 45);
             }
+            else if (runtime.seconds() < 18)
+            {
+                drive(2, .25, distance(22));
+            }
+            else if (runtime.seconds() < 21)
+            {
+                turningDrive(.1, 45);
+            }
+
 
 
 

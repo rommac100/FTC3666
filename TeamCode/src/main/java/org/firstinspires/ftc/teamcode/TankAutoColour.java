@@ -156,10 +156,9 @@ public class TankAutoColour extends LinearOpMode {
         telemetry.addData("Alliance Colour", "Red or Blue");
         telemetry.update();
 
-        //configurgation for RBB Sensor
-        cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        //configurgation for RGB Sensor
 
-        cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+        robot.device.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
         // get a reference to our ColorSensor object.
         sensorRGB = hardwareMap.colorSensor.get("sensor_color");

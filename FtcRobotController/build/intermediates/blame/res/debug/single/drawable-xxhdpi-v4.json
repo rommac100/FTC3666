@@ -1,10 +1,6 @@
 [
     {
-        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_launcher.png",
-        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/drawable-xxhdpi/ic_launcher.png"
-    },
-    {
-        "merged": "/home/rommac100/Documents/ftc_app-master/FtcRobotController/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_launcher.png",
-        "source": "/home/rommac100/Documents/ftc_app-master/FtcRobotController/src/main/res/drawable-xxhdpi/ic_launcher.png"
+        "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_launcher.png",
+        "source": "/home/rommac100/ftc_app/FtcRobotController/src/main/res/drawable-xxhdpi/ic_launcher.png"
     }
 ]

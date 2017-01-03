@@ -36,21 +36,10 @@ function openProjectBlocks(projectName) {
 }
 
 /**
- * Returns true if the given project name contains only valid characters.
- * This function does not check whether the project exists.
- */
-function isValidProjectName(projectName) {
-  if (projectName) {
-    return /^[a-zA-Z0-9]+$/.test(projectName);
-  }
-  return false;
-}
-
-/**
  * Creates the blocks for a new project.
  */
 function createBlocks() {
-  var blkContent = 
+  var blocksContent =
       '<xml xmlns="http://www.w3.org/1999/xhtml">\n' +
       '  <block type="procedures_defnoreturn" deletable="false" editable="false" x="50" y="50">\n' +
       '    <field name="NAME">runOpMode</field>\n' +
@@ -89,65 +78,65 @@ function createBlocks() {
       '    </statement>\n' +
       '  </block>\n' +
       '</xml>\n';
-  return blkContent;
+  return blocksContent;
 }
 
 /**
  * Creates the javascript for a new project.
  */
 function createJavaScript() {
-  var jsContent =
+  var jsFileContent =
       'function runOpMode() {\n' +
       '  linearOpMode.waitForStart();\n' +
       '  while (linearOpMode.opModeIsActive()) {\n' +
       '    telemetry.update();\n' +
       '  }\n' +
       '}\n';
-  return jsContent;
+  return jsFileContent;
 }
 
 /**
  * Fetches the blocks of an existing project and calls the callback
  */
-function fetchBlocks(projectName, callback) {
+function fetchBlkFileContent(projectName, callback) {
   if (typeof blocksIO !== 'undefined') {
     // FtcBlocks.html is within the WebView component within the Android app.
-    fetchBlocksViaBlocksIO(projectName, callback);
+    fetchBlkFileContentViaBlocksIO(projectName, callback);
   } else if (window.location.protocol === 'http:') {
     // FtcBlocks.html is in a browser, loaded as an http:// URL.
-    fetchBlocksViaHttp(projectName, callback);
+    fetchBlkFileContentViaHttp(projectName, callback);
   } else if (window.location.protocol === 'file:') {
     // FtcBlocks.html is in a browser, loaded as a file:// URL.
-    fetchBlocksViaFile(projectName, callback);
+    fetchBlkFileContentViaFile(projectName, callback);
   }
 }
 
 /**
  * Fetches the javascript of an existing project and calls the callback
  */
-function fetchJavaScript(projectName, callback) {
+function fetchJsFileContent(projectName, callback) {
   if (typeof blocksIO !== 'undefined') {
     // FtcBlocks.html is within the WebView component within the Android app.
-    fetchJavaScriptViaBlocksIO(projectName, callback);
+    fetchJsFileContentViaBlocksIO(projectName, callback);
   } else if (window.location.protocol === 'http:') {
     // FtcBlocks.html is in a browser, loaded as an http:// URL.
-    fetchJavaScriptViaHttp(projectName, callback);
+    fetchJsFileContentViaHttp(projectName, callback);
   } else if (window.location.protocol === 'file:') {
     // FtcBlocks.html is in a browser, loaded as a file:// URL.
-    fetchJavaScriptViaFile(projectName, callback);
+    fetchJsFileContentViaFile(projectName, callback);
   }
 }
 
-function saveProject(projectName, blkContent, jsContent, callback) {
+function saveProject(projectName, blkContent, jsFileContent, flavor, group, callback) {
   if (typeof blocksIO !== 'undefined') {
     // FtcBlocks.html is within the WebView component within the Android app.
-    saveProjectViaBlocksIO(projectName, blkContent, jsContent, callback);
+    saveProjectViaBlocksIO(projectName, blkContent, jsFileContent, flavor, group, callback);
   } else if (window.location.protocol === 'http:') {
     // FtcBlocks.html is in a browser, loaded as an http:// URL.
-    saveProjectViaHttp(projectName, blkContent, jsContent, callback);
+    saveProjectViaHttp(projectName, blkContent, jsFileContent, flavor, group, callback);
   } else if (window.location.protocol === 'file:') {
     // FtcBlocks.html is in a browser, loaded as a file:// URL.
-    saveProjectViaFile(projectName, blkContent, jsContent, callback);
+    saveProjectViaFile(projectName, blkContent, jsFileContent, flavor, group, callback);
   }
 }
 
@@ -177,16 +166,16 @@ function copyProject(oldProjectName, newProjectName, callback) {
   }
 }
 
-function deleteProjects(csvProjectNames, callback) {
+function deleteProjects(starDelimitedProjectNames, callback) {
   if (typeof blocksIO !== 'undefined') {
     // FtcBlocks.html is within the WebView component within the Android app.
-    deleteProjectsViaBlocksIO(csvProjectNames, callback);
+    deleteProjectsViaBlocksIO(starDelimitedProjectNames, callback);
   } else if (window.location.protocol === 'http:') {
     // FtcBlocks.html is in a browser, loaded as an http:// URL.
-    deleteProjectsViaHttp(csvProjectNames, callback);
+    deleteProjectsViaHttp(starDelimitedProjectNames, callback);
   } else if (window.location.protocol === 'file:') {
     // FtcBlocks.html is in a browser, loaded as a file:// URL.
-    deleteProjectsViaFile(csvProjectNames, callback);
+    deleteProjectsViaFile(starDelimitedProjectNames, callback);
   }
 }
 
@@ -207,26 +196,26 @@ function openProjectBlocksViaBlocksIO(projectName) {
   blocksIO.openProjectBlocks(projectName);
 }
 
-function fetchBlocksViaBlocksIO(projectName, callback) {
-  var blkContent = blocksIO.fetchBlocks(projectName);
-  if (blkContent) {
-    callback(blkContent, '');
+function fetchBlkFileContentViaBlocksIO(projectName, callback) {
+  var blkFileContent = blocksIO.fetchBlkFileContent(projectName);
+  if (blkFileContent) {
+    callback(blkFileContent, '');
   } else {
     callback(null, 'Fetch blocks failed.');
   }
 }
 
-function fetchJavaScriptViaBlocksIO(projectName, callback) {
-  var jsContent = blocksIO.fetchJavaScript(projectName);
-  if (jsContent) {
-    callback(jsContent, '');
+function fetchJsFileContentViaBlocksIO(projectName, callback) {
+  var jsFileContent = blocksIO.fetchJsFileContent(projectName);
+  if (jsFileContent) {
+    callback(jsFileContent, '');
   } else {
     callback(null, 'Fetch JavaScript failed.');
   }
 }
 
-function saveProjectViaBlocksIO(projectName, blkContent, jsContent, callback) {
-  var success = blocksIO.saveProject(projectName, blkContent, jsContent);
+function saveProjectViaBlocksIO(projectName, blkContent, jsFileContent, flavor, group, callback) {
+  var success = blocksIO.saveProject(projectName, blkContent, jsFileContent, flavor, group);
   if (success) {
     callback(true, '');
   } else {
@@ -255,8 +244,8 @@ function copyProjectViaBlocksIO(oldProjectName, newProjectName, callback) {
   }
 }
 
-function deleteProjectsViaBlocksIO(csvProjectNames, callback) {
-  var success = blocksIO.deleteProjects(csvProjectNames);
+function deleteProjectsViaBlocksIO(starDelimitedProjectNames, callback) {
+  var success = blocksIO.deleteProjects(starDelimitedProjectNames);
   if (success) {
     callback(true, '');
   } else {
@@ -279,6 +268,8 @@ var PARAM_PROJECT = 'project';
 var PARAM_NEWPROJECT = 'newproject';
 var PARAM_BLK = 'blk';
 var PARAM_JS = 'js';
+var PARAM_FLAVOR = 'flavor';
+var PARAM_GROUP = 'group';
 
 function fetchProjectsViaHttp(callback) {
   var xhr = new XMLHttpRequest();
@@ -303,7 +294,7 @@ function openProjectBlocksViaHttp(projectName) {
   window.location.href = 'FtcBlocks.html?project=' + encodeURIComponent(projectName);
 }
 
-function fetchBlocksViaHttp(projectName, callback) {
+function fetchBlkFileContentViaHttp(projectName, callback) {
   var xhr = new XMLHttpRequest();
   var params = PARAM_PROJECT + '=' + encodeURIComponent(projectName);
   xhr.open('POST', URI_LOAD, true);
@@ -311,8 +302,8 @@ function fetchBlocksViaHttp(projectName, callback) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
-        var blkContent = xhr.responseText;
-        callback(blkContent, '');
+        var blkFileContent = xhr.responseText;
+        callback(blkFileContent, '');
       } else {
         // TODO(lizlooney): Use specific error messages for various xhr.status values.
         callback(null, 'Fetch blocks failed. Error code ' + xhr.status + '. ' + xhr.statusText);
@@ -322,7 +313,7 @@ function fetchBlocksViaHttp(projectName, callback) {
   xhr.send(params);
 }
 
-function fetchJavaScriptViaHttp(projectName, callback) {
+function fetchJsFileContentViaHttp(projectName, callback) {
   var xhr = new XMLHttpRequest();
   var params = PARAM_PROJECT + '=' + encodeURIComponent(projectName);
   xhr.open('POST', URI_LOADJS, true);
@@ -330,8 +321,8 @@ function fetchJavaScriptViaHttp(projectName, callback) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
-        var jsContent = xhr.responseText;
-        callback(jsContent, '');
+        var jsFileContent = xhr.responseText;
+        callback(jsFileContent, '');
       } else {
         // TODO(lizlooney): Use specific error messages for various xhr.status values.
         callback(null, 'Fetch JavaScript failed. Error code ' + xhr.status + '. ' + xhr.statusText);
@@ -341,11 +332,17 @@ function fetchJavaScriptViaHttp(projectName, callback) {
   xhr.send(params);
 }
 
-function saveProjectViaHttp(projectName, blkContent, jsContent, callback) {
+function saveProjectViaHttp(projectName, blkContent, jsFileContent, flavor, group, callback) {
   var xhr = new XMLHttpRequest();
   var params = PARAM_PROJECT + '=' + encodeURIComponent(projectName) +
       '&' + PARAM_BLK + '=' + encodeURIComponent(blkContent) +
-      '&' + PARAM_JS + '=' + encodeURIComponent(jsContent);
+      '&' + PARAM_JS + '=' + encodeURIComponent(jsFileContent);
+  if (flavor != null) {
+    params += '&' + PARAM_FLAVOR + '=' + encodeURIComponent(flavor);
+  }
+  if (group != null) {
+    params += '&' + PARAM_GROUP + '=' + encodeURIComponent(group);
+  }
   xhr.open('POST', URI_SAVE, true);
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
@@ -399,9 +396,9 @@ function copyProjectViaHttp(oldProjectName, newProjectName, callback) {
   xhr.send(params);
 }
 
-function deleteProjectsViaHttp(csvProjectNames, callback) {
+function deleteProjectsViaHttp(starDelimitedProjectNames, callback) {
   var xhr = new XMLHttpRequest();
-  var params = PARAM_PROJECT + '=' + encodeURIComponent(csvProjectNames);
+  var params = PARAM_PROJECT + '=' + encodeURIComponent(starDelimitedProjectNames);
   xhr.open('POST', URI_DELETE, true);
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
@@ -422,9 +419,10 @@ function deleteProjectsViaHttp(csvProjectNames, callback) {
 
 function fetchProjectsViaFile(callback) {
   var jsonProjects = '[' +
-      '{ "name": "Autonomous", "dateModifiedMillis": 1464391007000},' +
-      '{ "name": "LineFollow", "dateModifiedMillis":1464591007000},' +
-      '{ "name": "TeleBot", "dateModifiedMillis":1464191007000}' +
+      '{ "name": "Autonomous", "escapedName": "Autonomous", "dateModifiedMillis": 1464391007000},' +
+      '{ "name": "LineFollow", "escapedName": "LineFollow", "dateModifiedMillis":1464591007000},' +
+      '{ "name": "TeleBot", "escapedName": "TeleBot", "dateModifiedMillis":1464191007000},' +
+      '{ "name": "Test&reg;", "escapedName": "Test&amp;reg;", "dateModifiedMillis":1464191007000}' +
       ']';
   callback(jsonProjects, '');
 }
@@ -434,34 +432,39 @@ function openProjectBlocksViaFile(projectName) {
   window.location.href = 'FtcBlocks.html?project=' + encodeURIComponent(projectName);
 }
 
-function fetchBlocksViaFile(projectName, callback) {
-  var fakeBlkContent = createBlocks();
-  callback(fakeBlkContent, '');
+function fetchBlkFileContentViaFile(projectName, callback) {
+  var fakeBlkFileContent = createBlocks();
+  fakeBlkFileContent += '<xml><OpModeMeta flavor="autonomous" group="abc"></OpModeMeta></xml>';
+  callback(fakeBlkFileContent, '');
 }
 
-function fetchJavaScriptViaFile(projectName, callback) {
+function fetchJsFileContentViaFile(projectName, callback) {
   var fakeJsContent = createJavaScript();
   callback(fakeJsContent, '');
 }
 
-function saveProjectViaFile(projectName, blkContent, jsContent, callback) {
+function saveProjectViaFile(projectName, blkContent, jsFileContent, flavor, group, callback) {
+  console.log('saveProjectViaFile');
+  console.log('projectName is ' + projectName);
   console.log('blkContent is ' + blkContent);
-  console.log('jsContent is ' + jsContent);
+  console.log('jsFileContent is ' + jsFileContent);
+  console.log('flavor is ' + flavor);
+  console.log('group is ' + group);
   callback(true, '');
   //callback(false, 'Save project failed.');
 }
 
-function renameProjectViaFile(projectName, blkContent, jsContent, callback) {
+function renameProjectViaFile(projectName, blkFileContent, jsFileContent, callback) {
   callback(true, '');
   //callback(false, 'Rename project failed.');
 }
 
-function copyProjectViaFile(projectName, blkContent, jsContent, callback) {
+function copyProjectViaFile(projectName, blkFileContent, jsFileContent, callback) {
   callback(true, '');
   //callback(false, 'Copy project failed.');
 }
 
-function deleteProjectsViaFile(csvProjectNames, callback) {
+function deleteProjectsViaFile(starDelimitedProjectNames, callback) {
   callback(true, '');
   //callback(false, 'Delete projects failed.');
 }

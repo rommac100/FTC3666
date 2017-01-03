@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -38,6 +39,7 @@ public class HardwareTank
     public DcMotor  flyWheelMotor2 = null;
     public Servo    beaconServo = null;
     public DeviceInterfaceModule device = null;
+    public ColorSensor colourSensor = null;
     public final double distancePerRev = 18.84;
     public final double ticksPerInch = 53.4776;
     public double leftDrivePower;       //power level for left side drive train motor
@@ -51,7 +53,7 @@ public class HardwareTank
     public double liveFlyPowerSetting = defaultFlyPower;
     public int maxSlideHeight = 1000;   //In theory this is low eneugh of a end height that we will have no problems in the short run, and can fine tune further from here.
                                         //should be less than one rotation right?
-
+    public int ledChannel = 5;
 
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
@@ -84,7 +86,7 @@ public class HardwareTank
         flyWheelMotor1.setDirection(DcMotor.Direction.REVERSE);
         beaconServo = hwMap.servo.get("beaconS");
         device = hwMap.deviceInterfaceModule.get("deviceINT");
-
+        colourSensor = hwMap.colorSensor.get("colour_sensor");
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -102,14 +104,6 @@ public class HardwareTank
 
     }
 
-    /***
-     *
-     * waitForTick implements a periodic delay. However, this acts like a metronome with a regular
-     * periodic tick.  This is used to compensate for varying processing times for each cycle.
-     * The function looks at the elapsed cycle time, and sleeps for the remaining time interval.
-     *
-     * @param periodMs  Length of wait cycle in mSec.
-     */
 
     public void drive(int direction, double power, int ticks, ElapsedTime runtime, LinearOpMode linear)
     {
@@ -165,6 +159,15 @@ public class HardwareTank
 
         }
     }
+
+    /***
+     *
+     * waitForTick implements a periodic delay. However, this acts like a metronome with a regular
+     * periodic tick.  This is used to compensate for varying processing times for each cycle.
+     * The function looks at the elapsed cycle time, and sleeps for the remaining time interval.
+     *
+     * @param periodMs  Length of wait cycle in mSec.
+     */
 
     public void waitForTick(long periodMs) {
 
