@@ -158,7 +158,7 @@ public class TankAutoTurning extends LinearOpMode {
     {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        boolean temp = false;
+        boolean temp = true;
 
         if (angle < 0)
         {
@@ -170,7 +170,7 @@ public class TankAutoTurning extends LinearOpMode {
                 robot.leftDrivePower = 0;
                 robot.rightDrivePower = 0;
 
-                temp = true;
+                temp = false;
 
             }
             robot.leftMotor.setPower(robot.leftDrivePower);
@@ -185,7 +185,7 @@ public class TankAutoTurning extends LinearOpMode {
             {
              robot.leftDrivePower = 0;
                 robot.rightDrivePower =0;
-                temp = true;
+                temp = false;
             }
             robot.leftMotor.setPower(robot.leftDrivePower);
             robot.rightMotor.setPower(robot.rightDrivePower);
@@ -282,15 +282,69 @@ public class TankAutoTurning extends LinearOpMode {
         robot.leftDrivePower = -.1;
         robot.rightDrivePower = .1;
 
-        float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)-45;
-        float angleDesired2 = angleDesired-45;
+        float angleDesired = 0;
+        float angleDesired2 = 0;
 
+
+        boolean driveForward1 = true;
+        boolean flywheels = false;
+        boolean turnDrive1 = false;
+        boolean driveForward2 = false;
+        boolean turnDrive2 = false;
+
+        //used for the flyWheels
+        double desiredTime = 0;
 
         while (opModeIsActive()) {
             //sleep(2000);
             //sleep(1000);
 
             //first conditional is relating to the inital movement
+
+
+            if (driveForward1)
+            {
+                drive(2, .25, distance(22));
+
+                flywheels = true;
+                driveForward1=false;
+
+            }
+            else if (flywheels)
+            {
+                if (desiredTime == 0)
+                {
+                    desiredTime = runtime.seconds() + 10;
+                }
+                robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
+                robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
+
+                if (runtime.seconds() > desiredTime -2)
+                {
+                    robot.spin2Motor.setPower(.4);
+                }
+                if (runtime.seconds() >= desiredTime)
+                {
+                    robot.flyWheelMotor1.setPower(0);
+                    robot.flyWheelMotor2.setPower(0);
+
+                    robot.spin2Motor.setPower(0);
+
+                    turnDrive1 = true;
+                    flywheels = false;
+                }
+            }
+            else if (turnDrive1)
+            {
+                if (angleDesired == 0)
+                {
+                    angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+45;
+                }
+                turnDrive1 = turningDriveBoolean(.1, 45, angleDesired);
+                driveForward2 = !turnDrive2;
+            }
+
+/*
             if (runtime.seconds() < 5) {
                 drive(2, .25, distance(22));
             }
@@ -330,7 +384,7 @@ public class TankAutoTurning extends LinearOpMode {
 
 
 
-
+*/
             //turningDrive(.1, 90);
             //telemetry.addData("Angle", angleDesired);
 /*
