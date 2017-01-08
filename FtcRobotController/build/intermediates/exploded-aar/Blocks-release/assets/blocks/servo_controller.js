@@ -6,7 +6,6 @@
 // The following are generated dynamically in HardwareUtil.fetchJavaScriptForHardware():
 // createServoControllerDropdown
 // The following are defined in vars.js:
-// createNonEditableField
 // functionColor
 // getPropertyColor
 

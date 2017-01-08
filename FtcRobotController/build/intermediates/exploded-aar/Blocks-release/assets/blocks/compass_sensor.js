@@ -6,7 +6,6 @@
 // The following are generated dynamically in HardwareUtil.fetchJavaScriptForHardware():
 // createCompassSensorDropdown
 // The following are defined in vars.js:
-// createNonEditableField
 // getPropertyColor
 // functionColor
 

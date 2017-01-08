@@ -6,9 +6,8 @@
 // The following are generated dynamically in HardwareUtil.fetchJavaScriptForHardware():
 // linearOpModeIdentifier
 // The following are defined in vars.js:
-// createNonEditableField
 // functionColor
-// currentProjectName
+// projectName
 
 // Functions
 
@@ -16,7 +15,7 @@ Blockly.Blocks['linearOpMode_waitForStart'] = {
   init: function() {
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('waitForStart'));
     this.setPreviousStatement(true);
@@ -34,7 +33,7 @@ Blockly.Blocks['linearOpMode_idle'] = {
   init: function() {
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('idle'));
     this.setPreviousStatement(true);
@@ -53,7 +52,7 @@ Blockly.Blocks['linearOpMode_sleep'] = {
   init: function() {
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('sleep'));
     this.appendValueInput('MILLISECONDS')
@@ -77,7 +76,7 @@ Blockly.Blocks['linearOpMode_opModeIsActive'] = {
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('opModeIsActive'));
     this.setTooltip('Return true if this opMode is active.');
@@ -95,7 +94,7 @@ Blockly.Blocks['linearOpMode_isStarted'] = {
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('isStarted'));
     this.setTooltip('Return true if this opMode has been started.');
@@ -113,7 +112,7 @@ Blockly.Blocks['linearOpMode_isStopRequested'] = {
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
+        .appendField(createNonEditableField(projectName))
         .appendField('.')
         .appendField(createNonEditableField('isStopRequested'));
     this.setTooltip('Return true if stopping of this opMode has been requested.');
@@ -123,23 +122,5 @@ Blockly.Blocks['linearOpMode_isStopRequested'] = {
 
 Blockly.JavaScript['linearOpMode_isStopRequested'] = function(block) {
   var code = linearOpModeIdentifier + '.isStopRequested()';
-  return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.Blocks['linearOpMode_getRuntime'] = {
-  init: function() {
-    this.setOutput(true);
-    this.appendDummyInput()
-        .appendField('call')
-        .appendField(createNonEditableField(currentProjectName))
-        .appendField('.')
-        .appendField(createNonEditableField('getRuntime'));
-    this.setTooltip('Get the number of seconds this op mode has been running.');
-    this.setColour(functionColor);
-  }
-};
-
-Blockly.JavaScript['linearOpMode_getRuntime'] = function(block) {
-  var code = linearOpModeIdentifier + '.getRuntime()';
   return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };

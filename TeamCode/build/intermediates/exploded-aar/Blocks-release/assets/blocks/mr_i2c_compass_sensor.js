@@ -6,7 +6,6 @@
 // The following are generated dynamically in HardwareUtil.fetchJavaScriptForHardware():
 // createMrI2cCompassSensorDropdown
 // The following are defined in vars.js:
-// createNonEditableField
 // getPropertyColor
 // setPropertyColor
 // functionColor

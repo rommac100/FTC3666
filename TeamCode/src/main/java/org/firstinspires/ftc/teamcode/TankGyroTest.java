@@ -39,6 +39,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -54,13 +56,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Template: Iterative OpMode", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
 public class TankGyroTest extends OpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
 
     private Wire gyro;
+    HardwareTank robot = new HardwareTank();
 
     private DataLogger  d1;
     private int readCount = 0;
@@ -127,14 +129,17 @@ public class TankGyroTest extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        gyro.beginWrite(107);
-        gyro.write(168);
-        gyro.endWrite();
-        gyro.requestFrom(107,6);
-        while (gyro.available() <6);
-        zraw = gyro.readLH();
+        if ((System.currentTimeMillis() - pingTime) > 0) {
+            gyro.requestFrom(107, 6);
+            gyro.beginWrite(107);
+            gyro.write(168);
+            gyro.endWrite();
+        }
 
-        telemetry.addData("GyroTest", "Zraw" + zraw);
+        if (gyro.responseCount() > 0) {
+            zraw = gyro.readLH();
+        }
+        telemetry.addData("GyroTest", zraw);
 
 
 
