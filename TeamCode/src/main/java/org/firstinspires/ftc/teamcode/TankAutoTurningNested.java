@@ -197,6 +197,8 @@ public class TankAutoTurningNested extends LinearOpMode {
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
                     robot.leftDrivePower = 0;
                     robot.rightDrivePower = 0;
+                    robot.leftMotor.setPower(robot.leftDrivePower);
+                    robot.rightMotor.setPower(robot.rightDrivePower);
                     break;
                 }
 
@@ -218,6 +220,9 @@ public class TankAutoTurningNested extends LinearOpMode {
                 if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired) {
                     robot.leftDrivePower = 0;
                     robot.rightDrivePower = 0;
+                    robot.leftMotor.setPower(robot.leftDrivePower);
+                    robot.rightMotor.setPower(robot.rightDrivePower);
+                    break;
                 }
                 robot.leftMotor.setPower(robot.leftDrivePower);
                 robot.rightMotor.setPower(robot.rightDrivePower);
@@ -302,7 +307,7 @@ public class TankAutoTurningNested extends LinearOpMode {
 
             if (driveForward1)
             {
-                drive(2, -.25, distance(22));
+                drive(0, .25, distance(22));
 
                 flywheels = true;
                 driveForward1=false;
@@ -328,15 +333,21 @@ public class TankAutoTurningNested extends LinearOpMode {
 
                     robot.spin2Motor.setPower(0);
 
-                    turnDrive1 = true;
                     flywheels = false;
+                    turnDrive1 = true;
+
                 }
             }
-
             else if (turnDrive1)
             {
                 turningDrive(.1, 45);
                 turnDrive1 = false;
+                driveForward2 = true;
+            }
+             else if (driveForward2)
+            {
+                drive(0, .25, distance(31));
+                driveForward2 = false;
             }
 /*
             if (runtime.seconds() < 5) {

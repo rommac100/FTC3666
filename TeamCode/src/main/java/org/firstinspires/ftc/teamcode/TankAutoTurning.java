@@ -32,12 +32,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -81,15 +84,14 @@ public class TankAutoTurning extends LinearOpMode {
     HardwareTank robot   = new HardwareTank();
     private ElapsedTime     runtime = new ElapsedTime();
 
+    private double centerQ = 0;
+
     // The IMU sensor object
     BNO055IMU imu;
 
     // State used for updating telemetry
     Orientation angles;
     Acceleration gravity;
-
-    boolean firstAngle = true;
-    boolean secondAngle = true;
 
     public int distance(double dis)
     {
@@ -114,7 +116,7 @@ public class TankAutoTurning extends LinearOpMode {
             case 0:
                 robot.leftMotor.setPower(power);
                 robot.rightMotor.setPower(power);
-                while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+                while(robot.leftMotor.isBusy() && opModeIsActive())
                 {
 
                 }
@@ -126,6 +128,26 @@ public class TankAutoTurning extends LinearOpMode {
                 robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
+
+            case 1://align to white line using center sensor
+                robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                while (centerQ < .2 && opModeIsActive())
+                {
+                    centerQ= robot.device.getAnalogInputVoltage(4);
+                    robot.leftMotor.setPower(power);
+                    robot.rightMotor.setPower(power);
+                }
+                robot.leftMotor.setPower(0);
+                robot.leftMotor.setPower(0);
+                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
+
+
             case 2:
                 robot.leftMotor.setPower(-1*power);
                 robot.rightMotor.setPower(-1*power);
@@ -177,9 +199,7 @@ public class TankAutoTurning extends LinearOpMode {
                     robot.leftMotor.setPower(robot.leftDrivePower);
                     robot.rightMotor.setPower(robot.rightDrivePower);
                 }
-                if(temptime<0){
 
-                }
             }
 
         }
@@ -265,6 +285,65 @@ public class TankAutoTurning extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+    public double colourSensorCheck(String teamColour)
+    {
+        int red = robot.colourSensor.red();
+        int blue = robot.colourSensor.blue();
+
+        int x = 0;
+        int blueAvg = 0;
+
+        //averaging loop
+        while (opModeIsActive() && x <= 3)
+        {
+            blueAvg += blue;
+            sleep(20);
+            blue = robot.colourSensor.blue();
+            x++;
+        }
+        x= 0;
+
+        int redAvg = 0;
+        //averaging loop
+        while (opModeIsActive() && x <=3)
+        {
+            redAvg += red;
+            sleep(20);
+            red = robot.colourSensor.red();
+            x++;
+        }
+
+        //Different conditionals relating the colour sensor output + team Alliance colour.
+        if (teamColour.equals("blue")) {
+            if ((redAvg / 3) > blueAvg / 3) {
+                return .2;
+            }
+            else if (redAvg /3 > blueAvg /3 )
+            {
+                return .9;
+            }
+            else
+            {
+                return colourSensorCheck("blue");
+            }
+        }
+        else if (teamColour.equals("red"))
+        {
+            if ((redAvg/3) > blueAvg/3)
+            {
+                return .9;
+            }
+            else if (redAvg/3 < blueAvg/3)
+            {
+                return .2;
+            }
+            else {
+                return colourSensorCheck("blue");
+            }
+        }
+    return .5;
+    }
+
     @Override
     public void runOpMode() {
 
@@ -295,10 +374,11 @@ public class TankAutoTurning extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        double tempTime = 0;
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+        centerQ= robot.device.getAnalogInputVoltage(4);
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
         //Step 1: drive forward one foam Pad
@@ -306,12 +386,6 @@ public class TankAutoTurning extends LinearOpMode {
         robot.rightMotor.setPower(0);
         runtime.reset();
         composeTelemetry();
-
-
-
-        //telemetry.addData("Angle",angleDesired);
-        robot.leftDrivePower = -.1;
-        robot.rightDrivePower = .1;
 
         float angleDesired = 0;
         float angleDesired2 = 0;
@@ -321,21 +395,18 @@ public class TankAutoTurning extends LinearOpMode {
         boolean flywheels = false;
         boolean turnDrive1 = false;
         boolean driveForward2 = false;
+        boolean driveForward3 = false;
         boolean turnDrive2 = false;
+        boolean colourSensorGo = false;
 
         //used for the flyWheels
         double desiredTime = 0;
 
         while (opModeIsActive()) {
-            //sleep(2000);
-            //sleep(1000);
-
-            //first conditional is relating to the inital movement
-
 
             if (driveForward1)
             {
-                drive(2, -.25, distance(22));
+                drive(0, .25, distance(22));
 
                 flywheels = true;
                 driveForward1=false;
@@ -365,169 +436,46 @@ public class TankAutoTurning extends LinearOpMode {
                     flywheels = false;
                 }
             }
-
             else if (turnDrive1)
             {
                 if (angleDesired == 0)
                 {
-                    angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+45;
+                    angleDesired = 5;
                 }
-                turnDrive1 = turningDriveBoolean(.05, 45, angleDesired);
-                driveForward2 = !turnDrive2;
+                turnDrive1 = turningDriveBoolean(.1,  5, angleDesired);
+                driveForward2 = !turnDrive1;
             }
-/*
-            if (runtime.seconds() < 5) {
-                drive(2, .25, distance(22));
-            }
-            //second conditional is relating to the firing of the particles
-            else if (runtime.seconds() < 12)
+            else if (driveForward2)
             {
-                if (runtime.seconds() > 7)
+                drive(2,.25, distance(40));
+                turnDrive2 = true;
+                driveForward2=false;
+            }
+            else if (turnDrive2)
+            {
+                if (angleDesired2 == 0)
                 {
-                    robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
-                    robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
+                    angleDesired2 = -70;
                 }
-                else if (runtime.seconds() < 11)
-                {
-                    robot.spin2Motor.setPower(.4);
-                }
-                else if (runtime.seconds() >= 11)
-                {
-                    robot.spin2Motor.setPower(0);
-                    robot.flyWheelMotor1.setPower(0);
-                    robot.flyWheelMotor2.setPower(0);
-                }
-
+                turnDrive2 = turningDriveBoolean(.1,  -80, angleDesired2);
+                driveForward3 = !turnDrive2;
             }
-            else if (runtime.seconds() < 15)
+            else if (driveForward3)
             {
-                turningDrive(.1, 45);
+                drive(2,.25,distance(27));
+                driveForward3 = false;
+                colourSensorGo = true;
             }
-            else if (runtime.seconds() < 18)
+            else if (colourSensorGo)
             {
-                drive(2, .25, distance(22));
+                robot.beaconServo.setPosition(colourSensorCheck("red"));
+                drive(2,.1,distance(2));
+                drive(0, .1, distance(3));
+                colourSensorGo = false;
             }
-            else if (runtime.seconds() < 21)
-            {
-                turningDrive(.1, 45);
-            }
 
-
-
-
-*/
-            //turningDrive(.1, 90);
-            //telemetry.addData("Angle", angleDesired);
-/*
-            if (!firstMove)
-            {
-                drive(2, .25, distance(22));
-                flyWheel = false;
-                firstMove = true;
-
-            }
-            else if (!flyWheel)
-            {
-                if (tempTime == 0)
-                {
-                    tempTime = runtime.seconds() + 8;
-                }
-
-                if (runtime.seconds() < tempTime)
-                {
-                    robot.flyWheelMotor1.setPower(0.7);
-                    robot.flyWheelMotor2.setPower(0.7);
-
-                    if (runtime.seconds() > tempTime + 3)
-                    {
-                        robot.spin2Motor.setPower(.4);
-                    }
-                }
-                robot.spin1Motor.setPower(0);
-                robot.spin2Motor.setPower(0);
-                robot.flyWheelMotor1.setPower(0);
-                robot.flyWheelMotor2.setPower(0);
-                firstTurn = false;
-                flyWheel = true;
-            }
-            else if (!firstTurn) {
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                    secondMove = false;
-                    firstTurn = true;
-                }
-
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                robot.leftMotor.setPower(robot.leftDrivePower);
-            }
-            */
-            /*
-            else if (!secondMove)
-            {
-                drive(2, .25, distance(22));
-                secondTurn =false;
-                secondMove = true;
-            }
-            else if (!secondTurn)
-            {
-                robot.leftDrivePower = .1;
-                robot.rightDrivePower = -.1;
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired2) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                    secondTurn = true;
-                }
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                robot.leftMotor.setPower(robot.leftDrivePower);
-
-            }
-            */
             telemetry.update();
             }
-
-
-
-
-
-
-
-
-        /*
-        drive(2, .25, distance(22));
-        sleep(1000);
-
-
-            double tempTime = runtime.seconds() + 8;
-            while (runtime.seconds() < tempTime) {
-                if (runtime.seconds() < tempTime - 3) {
-
-                    robot.flyWheelMotor1.setPower(.7);
-                    robot.flyWheelMotor2.setPower(.7);
-                }
-
-
-
-                //robot.spin1Motor.setPower(.8);
-                robot.spin2Motor.setPower(.4);
-            }
-            robot.spin1Motor.setPower(0);
-            robot.spin2Motor.setPower(0);
-            robot.flyWheelMotor1.setPower(0);
-            robot.flyWheelMotor2.setPower(0);
-
-            turningDrive(-.5, distance(100));
-*/
-            //runtime.reset();
-            //sleep(2000);
-            //drive(2, 1, distance(35));
-
-
-            // Step 4:  Stop and close the claw
-
-
-
-            //sleep(1000);
     }
     void composeTelemetry() {
 
