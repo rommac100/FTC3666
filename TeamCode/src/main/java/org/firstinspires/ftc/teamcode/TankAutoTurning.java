@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -102,6 +103,8 @@ public class TankAutoTurning extends LinearOpMode {
     //0 = forward, 2 = reverse
     public void drive(int direction, double power, int ticks)
     {
+        telemetry.addData("Drive", direction);
+        telemetry.update();
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -111,62 +114,47 @@ public class TankAutoTurning extends LinearOpMode {
         robot.leftMotor.setTargetPosition(ticks);
         robot.rightMotor.setTargetPosition(ticks);
         double timeTemp = runtime.seconds()+10;
-        switch (direction)
+
+
+        if (direction ==0)
         {
-            case 0:
-                robot.leftMotor.setPower(power);
-                robot.rightMotor.setPower(power);
-                while(robot.leftMotor.isBusy() && opModeIsActive())
-                {
+            robot.leftMotor.setPower(power);
+            robot.rightMotor.setPower(power);
+            while(robot.leftMotor.isBusy() && opModeIsActive())
+            {
 
-                }
-                robot.leftMotor.setPower(0);
-                robot.rightMotor.setPower(0);
+            }
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
 
-                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                break;
-
-            case 1://align to white line using center sensor
-                robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-                while (centerQ < .2 && opModeIsActive())
-                {
-                    centerQ= robot.device.getAnalogInputVoltage(4);
-                    robot.leftMotor.setPower(power);
-                    robot.rightMotor.setPower(power);
-                }
-                robot.leftMotor.setPower(0);
-                robot.leftMotor.setPower(0);
-                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                break;
-
-
-            case 2:
-                robot.leftMotor.setPower(-1*power);
-                robot.rightMotor.setPower(-1*power);
-                while(robot.leftMotor.isBusy() && opModeIsActive())
-                {
-
-                }
-
-                robot.leftMotor.setPower(0);
-                robot.rightMotor.setPower(0);
-
-                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                break;
-
-
+            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        else if (direction == 2)
+        {
+            telemetry.addData("Case 2", "");
+            telemetry.update();
+            robot.leftMotor.setTargetPosition(-ticks);
+            robot.rightMotor.setTargetPosition(-ticks);
+            robot.leftMotor.setPower(power);
+            robot.rightMotor.setPower(power);
+
+            while(robot.leftMotor.isBusy() && opModeIsActive())
+            {
+                telemetry.addData("motorLeft Pwr", robot.leftMotor.getPower());
+            }
+
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+
+            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
     }
 
         public void betterTurn(double power, float angleDesired)
@@ -423,14 +411,14 @@ public class TankAutoTurning extends LinearOpMode {
 
                 if (runtime.seconds() > desiredTime -8)
                 {
-                    robot.spin2Motor.setPower(.4);
+                    robot.spin1Motor.setPower(.4);
                 }
                 if (runtime.seconds() >= desiredTime)
                 {
                     robot.flyWheelMotor1.setPower(0);
                     robot.flyWheelMotor2.setPower(0);
 
-                    robot.spin2Motor.setPower(0);
+                    robot.spin1Motor.setPower(0);
 
                     turnDrive1 = true;
                     flywheels = false;
@@ -447,7 +435,9 @@ public class TankAutoTurning extends LinearOpMode {
             }
             else if (driveForward2)
             {
-                drive(2,.25, distance(40));
+                telemetry.addData("drive2", "");
+                telemetry.update();
+                drive(0,.25, distance(40));
                 turnDrive2 = true;
                 driveForward2=false;
             }
@@ -458,19 +448,25 @@ public class TankAutoTurning extends LinearOpMode {
                     angleDesired2 = -70;
                 }
                 turnDrive2 = turningDriveBoolean(.1,  -80, angleDesired2);
-                driveForward3 = !turnDrive2;
+                if (!turnDrive2)
+                {
+                driveForward3 = true;
+                }
+
             }
             else if (driveForward3)
             {
-                drive(2,.25,distance(27));
+                drive (2,.25,distance(27));
+
                 driveForward3 = false;
                 colourSensorGo = true;
             }
+
             else if (colourSensorGo)
             {
                 robot.beaconServo.setPosition(colourSensorCheck("red"));
-                drive(2,.1,distance(2));
-                drive(0, .1, distance(3));
+                drive(0,.1,distance(2));
+                drive(2, .1, distance(3));
                 colourSensorGo = false;
             }
 

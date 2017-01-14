@@ -257,11 +257,11 @@ public class TankAutoTurningNested extends LinearOpMode {
         telemetry.update();
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -270,7 +270,7 @@ public class TankAutoTurningNested extends LinearOpMode {
         double tempTime = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+        angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
         //Step 1: drive forward one foam Pad
@@ -278,7 +278,6 @@ public class TankAutoTurningNested extends LinearOpMode {
         robot.rightMotor.setPower(0);
         runtime.reset();
         composeTelemetry();
-
 
 
         //telemetry.addData("Angle",angleDesired);
@@ -304,205 +303,42 @@ public class TankAutoTurningNested extends LinearOpMode {
 
             //first conditional is relating to the inital movement
 
-
-            if (driveForward1)
+            if (tempTime == 0)
             {
-                drive(0, .25, distance(22));
-
-                flywheels = true;
-                driveForward1=false;
-
+                tempTime = 20;
+                robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
-            else if (flywheels)
+            if(runtime.seconds() < tempTime)
             {
-                if (desiredTime == 0)
-                {
-                    desiredTime = runtime.seconds() + 10;
-                }
-                robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
-                robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
-
-                if (runtime.seconds() > desiredTime -8)
-                {
-                    robot.spin2Motor.setPower(.4);
-                }
-                if (runtime.seconds() >= desiredTime)
-                {
-                    robot.flyWheelMotor1.setPower(0);
-                    robot.flyWheelMotor2.setPower(0);
-
-                    robot.spin2Motor.setPower(0);
-
-                    flywheels = false;
-                    turnDrive1 = true;
-
-                }
+                robot.flyWheelMotor1.setPower(1.00);
+                robot.flyWheelMotor2.setPower(1.00);
             }
-            else if (turnDrive1)
+            else
             {
-                turningDrive(.1, 45);
-                turnDrive1 = false;
-                driveForward2 = true;
-            }
-             else if (driveForward2)
-            {
-                drive(0, .25, distance(31));
-                driveForward2 = false;
-            }
-/*
-            if (runtime.seconds() < 5) {
-                drive(2, .25, distance(22));
-            }
-            //second conditional is relating to the firing of the particles
-            else if (runtime.seconds() < 12)
-            {
-                if (runtime.seconds() > 7)
-                {
-                    robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
-                    robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
-                }
-                else if (runtime.seconds() < 11)
-                {
-                    robot.spin2Motor.setPower(.4);
-                }
-                else if (runtime.seconds() >= 11)
-                {
-                    robot.spin2Motor.setPower(0);
-                    robot.flyWheelMotor1.setPower(0);
-                    robot.flyWheelMotor2.setPower(0);
-                }
-
-            }
-            else if (runtime.seconds() < 15)
-            {
-                turningDrive(.1, 45);
-            }
-            else if (runtime.seconds() < 18)
-            {
-                drive(2, .25, distance(22));
-            }
-            else if (runtime.seconds() < 21)
-            {
-                turningDrive(.1, 45);
-            }
-
-
-
-
-*/
-            //turningDrive(.1, 90);
-            //telemetry.addData("Angle", angleDesired);
-/*
-            if (!firstMove)
-            {
-                drive(2, .25, distance(22));
-                flyWheel = false;
-                firstMove = true;
-
-            }
-            else if (!flyWheel)
-            {
-                if (tempTime == 0)
-                {
-                    tempTime = runtime.seconds() + 8;
-                }
-
-                if (runtime.seconds() < tempTime)
-                {
-                    robot.flyWheelMotor1.setPower(0.7);
-                    robot.flyWheelMotor2.setPower(0.7);
-
-                    if (runtime.seconds() > tempTime + 3)
-                    {
-                        robot.spin2Motor.setPower(.4);
-                    }
-                }
-                robot.spin1Motor.setPower(0);
-                robot.spin2Motor.setPower(0);
-                robot.flyWheelMotor1.setPower(0);
                 robot.flyWheelMotor2.setPower(0);
-                firstTurn = false;
-                flyWheel = true;
+                robot.flyWheelMotor1.setPower(0);
             }
-            else if (!firstTurn) {
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                    secondMove = false;
-                    firstTurn = true;
-                }
 
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                robot.leftMotor.setPower(robot.leftDrivePower);
-            }
-            */
-            /*
-            else if (!secondMove)
-            {
-                drive(2, .25, distance(22));
-                secondTurn =false;
-                secondMove = true;
-            }
-            else if (!secondTurn)
-            {
-                robot.leftDrivePower = .1;
-                robot.rightDrivePower = -.1;
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired2) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                    secondTurn = true;
-                }
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                robot.leftMotor.setPower(robot.leftDrivePower);
 
-            }
-            */
+            int flyWheelPos1 = robot.flyWheelMotor1.getCurrentPosition();
+            int flyWheelPos2 = robot.flyWheelMotor2.getCurrentPosition();
+
+            flyWheelPos1 = flyWheelPos1/20;
+            flyWheelPos2 = flyWheelPos2/20;
+
+            telemetry.addData("flyWheelPos1",flyWheelPos1);
+            telemetry.addData("flyWheelPos2",flyWheelPos2);
+
             telemetry.update();
-            }
-
-
-
-
-
-
-
-
-        /*
-        drive(2, .25, distance(22));
-        sleep(1000);
-
-
-            double tempTime = runtime.seconds() + 8;
-            while (runtime.seconds() < tempTime) {
-                if (runtime.seconds() < tempTime - 3) {
-
-                    robot.flyWheelMotor1.setPower(.7);
-                    robot.flyWheelMotor2.setPower(.7);
-                }
-
-
-
-                //robot.spin1Motor.setPower(.8);
-                robot.spin2Motor.setPower(.4);
-            }
-            robot.spin1Motor.setPower(0);
-            robot.spin2Motor.setPower(0);
-            robot.flyWheelMotor1.setPower(0);
-            robot.flyWheelMotor2.setPower(0);
-
-            turningDrive(-.5, distance(100));
-*/
-            //runtime.reset();
-            //sleep(2000);
-            //drive(2, 1, distance(35));
-
-
-            // Step 4:  Stop and close the claw
-
-
-
-            //sleep(1000);
+        }
     }
+
+
     void composeTelemetry() {
 
         // At the beginning of each telemetry update, grab a bunch of data

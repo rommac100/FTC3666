@@ -71,17 +71,17 @@ public class TankTeleopIterative extends OpMode
 
     @Override
     public void init() {
+        robot.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
         telemetry.addData("left",  robot.leftDrivePower);
         telemetry.addData("right", robot.rightDrivePower);
-        telemetry.addData("beaconServo" , robot.beaconServo.getPosition());
         telemetry.addData("liveFly",robot.liveFlyPowerSetting);
         telemetry.addData("FlyWheel2", robot.flyWheelMotor2.getPower());
         telemetry.addData("flyWheel1", robot.flyWheelMotor1.getPower());
         telemetry.addData("spin1Motor", robot.spin1Motor.getPower());
         telemetry.addData("spin2Motor", robot.spin2Motor.getPower());
 
-        robot.init(hardwareMap);
+
 
         robot.leftDrivePower = 0;
         robot.rightDrivePower = 0;
@@ -94,16 +94,15 @@ public class TankTeleopIterative extends OpMode
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //Linear Slide Movement Configuration, Currently Sketchy
-        robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        //Linear Slide Movement Configuration, Currently Sketchy
         //Drive Train Joystick Declaration
         robot.leftDrivePower  = gamepad1.left_stick_y;
         robot.rightDrivePower = gamepad1.right_stick_y;
 
     }
+
+
 
     @Override
     public void init_loop() {
@@ -121,23 +120,48 @@ public class TankTeleopIterative extends OpMode
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+
+    public void getMaxSpeed()
+    {
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        double tempTime = runtime.seconds();
+        tempTime+=30;
+        while(runtime.seconds() < tempTime)
+        {
+            robot.flyWheelMotor1.setPower(1.00);
+            robot.flyWheelMotor2.setPower(1.00);
+        }
+
+        robot.flyWheelMotor1.setPower(0.0);
+        robot.flyWheelMotor2.setPower(0.0);
+
+        int flyWheelPos1 = robot.flyWheelMotor1.getCurrentPosition();
+        int flyWheelPos2 = robot.flyWheelMotor2.getCurrentPosition();
+
+        flyWheelPos1 = flyWheelPos1/30;
+        flyWheelPos2 = flyWheelPos2/30;
+
+        telemetry.addData("flyWheelPos1",flyWheelPos1);
+        telemetry.addData("flyWheelPos2",flyWheelPos2);
+
+        telemetry.update();
+
+    }
     @Override
     public void loop() {
-        telemetry.addData("Status", "Running: " + runtime.toString());
 
         //Intake System Joystick Declaration
         robot.innerIntakePower = gamepad2.right_stick_y;
         robot.outerIntakePower = gamepad2.left_stick_y;
 
-        if (gamepad2.y) {
-            if (robot.linearSlide.getCurrentPosition() < robot.maxSlideHeight) {
-                robot.linearSlidePower = 0.15;
-            }
-        } else if (gamepad2.a) {
-            if (robot.linearSlide.getCurrentPosition() > 0) {
-                robot.linearSlidePower = -0.15;
-            }
-        }
+        robot.leftDrivePower  = gamepad1.left_stick_y;
+        robot.rightDrivePower = gamepad1.right_stick_y;
 
         /*Sketchy Code ahead
         else if(gamepad2.x)
@@ -155,23 +179,23 @@ public class TankTeleopIterative extends OpMode
          End of it Thankfully*/
 
         //Flywheel Conditionals, allows the variability of power/speed
-        if (gamepad2.dpad_down) {
-            robot.liveFlyPowerSetting -= .05;
-        } else if (gamepad2.dpad_up) {
-            robot.liveFlyPowerSetting += 0.01;
-        } else if (gamepad2.dpad_right) {
+         if (gamepad2.dpad_right) {
             robot.liveFlyPowerSetting = robot.defaultFlyPower;
-        } else if (gamepad2.dpad_right && gamepad2.dpad_up) {
-            robot.liveFlyPowerSetting = robot.defaultFlyPower + 0.2;
-        } else if (gamepad2.dpad_right && gamepad2.dpad_down) {
-            robot.liveFlyPowerSetting = robot.defaultFlyPower - 0.2;
         } else if (gamepad2.right_trigger > 0) {
             robot.flyWheelMotor1.setPower(robot.systemFlyPower);
             robot.flyWheelMotor2.setPower(robot.systemFlyPower);
-        } else {
+        }
+         else if (gamepad2.dpad_up)
+         {
+
+         }
+         else {
             robot.flyWheelMotor1.setPower(0);
             robot.flyWheelMotor2.setPower(0);
         }
+
+
+
 
 
         //Slowing down speed for the Capturing of Beacons

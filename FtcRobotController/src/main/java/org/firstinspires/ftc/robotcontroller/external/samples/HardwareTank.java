@@ -48,7 +48,7 @@ public class HardwareTank
     public double outerIntakePower;     //power level for the outer intake
     public double systemFlyPower;       //current power level for fly motors
     public double marvinPos = .5;
-    public double defaultFlyPower = 0.7;
+    public double defaultFlyPower = 0.9;
     public double linearSlidePower;
     public double liveFlyPowerSetting = defaultFlyPower;
     public int maxSlideHeight = 1000;   //In theory this is low eneugh of a end height that we will have no problems in the short run, and can fine tune further from here.
@@ -65,7 +65,7 @@ public class HardwareTank
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
-        // save reference to HW Mapff
+        // save reference to HW Map
         hwMap = ahwMap;
 
         // Define and Initialize Motors
@@ -95,6 +95,9 @@ public class HardwareTank
         flyWheelMotor1.setPower(0);
         flyWheelMotor2.setPower(0);
         beaconServo.setPosition(.5);
+
+        flyWheelMotor1.setMaxSpeed(1200);
+        flyWheelMotor2.setMaxSpeed(1200);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
