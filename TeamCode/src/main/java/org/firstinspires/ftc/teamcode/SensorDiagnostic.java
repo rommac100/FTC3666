@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -96,6 +98,10 @@ public class SensorDiagnostic extends OpMode
 
         robot.flyWheelMotor1.setPower(0);
         robot.flyWheelMotor2.setPower(0);
+        telemetry.addData("Clear", robot.colourSensor.alpha());
+        telemetry.addData("Red  ", robot.colourSensor.red());
+        telemetry.addData("Green", robot.colourSensor.green());
+        telemetry.addData("Blue ", robot.colourSensor.blue());
 
     }
 
@@ -107,13 +113,18 @@ public class SensorDiagnostic extends OpMode
 
 
         leftQ  = robot.device.getAnalogInputVoltage(3);
-        centerQ= robot.device.getAnalogInputVoltage(4);
+        centerQ= robot.device.getAnalogInputVoltage(0);
         rightQ = robot.device.getAnalogInputVoltage(5);
 
 
         telemetry.addData("Left", leftQ);
         telemetry.addData("Right", rightQ);
         telemetry.addData("Center", centerQ);
+
+        telemetry.addData("Clear", robot.colourSensor.alpha());
+        telemetry.addData("Red  ", robot.colourSensor.red());
+        telemetry.addData("Green", robot.colourSensor.green());
+        telemetry.addData("Blue ", robot.colourSensor.blue());
 
 
     }

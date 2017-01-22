@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Hardware;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
@@ -68,6 +69,7 @@ public class TankTeleopIterative extends OpMode
     private boolean direction = true; // true equals normal direction
     private boolean drift = true;
     private double halfSpeed = 1;       //current speed reduction coefficient.  1 at normal power.
+    private double flyWheelDelta = .1;
 
     @Override
     public void init() {
@@ -78,6 +80,7 @@ public class TankTeleopIterative extends OpMode
         telemetry.addData("liveFly",robot.liveFlyPowerSetting);
         telemetry.addData("FlyWheel2", robot.flyWheelMotor2.getPower());
         telemetry.addData("flyWheel1", robot.flyWheelMotor1.getPower());
+        telemetry.addData("flyWheelSysPower", robot.systemFlyPower);
         telemetry.addData("spin1Motor", robot.spin1Motor.getPower());
         telemetry.addData("spin2Motor", robot.spin2Motor.getPower());
 
@@ -163,31 +166,18 @@ public class TankTeleopIterative extends OpMode
         robot.leftDrivePower  = gamepad1.left_stick_y;
         robot.rightDrivePower = gamepad1.right_stick_y;
 
-        /*Sketchy Code ahead
-        else if(gamepad2.x)
-            {
-                robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.linearSlide.setTargetPosition(0);
-            }
-            if(robot.linearSlide.getMode() = "RUN_TO_POSITION")
-            {
-                if(!robot.linearSlide.isBusy())
-                {
-                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                }
-            }
-         End of it Thankfully*/
 
         //Flywheel Conditionals, allows the variability of power/speed
          if (gamepad2.dpad_right) {
-            robot.liveFlyPowerSetting = robot.defaultFlyPower;
+            robot.systemFlyPower = robot.defaultFlyPower;
         } else if (gamepad2.right_trigger > 0) {
             robot.flyWheelMotor1.setPower(robot.systemFlyPower);
             robot.flyWheelMotor2.setPower(robot.systemFlyPower);
         }
-         else if (gamepad2.dpad_up)
+         else if (robot.innerIntakePower > 0)
          {
-
+             robot.flyWheelMotor1.setPower(-.2);
+             robot.flyWheelMotor2.setPower(-.2);
          }
          else {
             robot.flyWheelMotor1.setPower(0);
@@ -221,9 +211,9 @@ public class TankTeleopIterative extends OpMode
 
         //Marvin Servo Control, using 180 degree Servo on the Intake side of the Robot
         if (gamepad1.left_trigger > 0) {
-            robot.marvinPos = .2;
-        } else if (gamepad1.right_trigger > 0) {
             robot.marvinPos = .9;
+        } else if (gamepad1.right_trigger > 0) {
+            robot.marvinPos = .2;
         }
 
         //Normalization of Intake System values, since it is driven by joysticks
@@ -232,6 +222,8 @@ public class TankTeleopIterative extends OpMode
             robot.innerIntakePower /= maxIntakeSystem;
             robot.outerIntakePower /= maxIntakeSystem;
         }
+
+
 
         //Normalization of the Drive Train Values, since it is also driven by joysticks
         maxDriveTrain = Math.max(Math.abs(robot.leftDrivePower), Math.abs(robot.rightDrivePower));

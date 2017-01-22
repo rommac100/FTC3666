@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -87,17 +88,17 @@ public class TankAutoTurning extends LinearOpMode {
 
     private double centerQ = 0;
 
+    public int distance(double dis)
+    {
+        return (int)(dis*robot.ticksPerInch);
+    }
+
     // The IMU sensor object
     BNO055IMU imu;
 
     // State used for updating telemetry
     Orientation angles;
     Acceleration gravity;
-
-    public int distance(double dis)
-    {
-        return (int)(dis*robot.ticksPerInch);
-    }
 
 
     //0 = forward, 2 = reverse
@@ -115,7 +116,7 @@ public class TankAutoTurning extends LinearOpMode {
         robot.rightMotor.setTargetPosition(ticks);
         double timeTemp = runtime.seconds()+10;
 
-
+        centerQ = robot.device.getAnalogInputVoltage(0);
         if (direction ==0)
         {
             robot.leftMotor.setPower(power);
@@ -131,6 +132,24 @@ public class TankAutoTurning extends LinearOpMode {
             robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else if (direction == 1)
+        {
+            telemetry.addData("case 1", "");
+            telemetry.update();
+            telemetry.addData("centerQ", centerQ);
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftMotor.setPower(power);
+            robot.rightMotor.setPower(power);
+            while (opModeIsActive() &&  centerQ < .2);
+            {
+telemetry.update();
+            }
+            robot.leftMotor.setPower(0);
+            robot.leftMotor.setPower(0);
+            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         else if (direction == 2)
         {
@@ -208,7 +227,6 @@ public class TankAutoTurning extends LinearOpMode {
             {
                 robot.leftDrivePower = 0;
                 robot.rightDrivePower = 0;
-
                 temp = false;
 
             }
@@ -279,34 +297,20 @@ public class TankAutoTurning extends LinearOpMode {
         int blue = robot.colourSensor.blue();
 
         int x = 0;
-        int blueAvg = 0;
+
 
         //averaging loop
-        while (opModeIsActive() && x <= 3)
-        {
-            blueAvg += blue;
-            sleep(20);
-            blue = robot.colourSensor.blue();
-            x++;
-        }
-        x= 0;
+        telemetry.addData("redVal", red);
+        telemetry.addData("blueVal", blue);
 
-        int redAvg = 0;
-        //averaging loop
-        while (opModeIsActive() && x <=3)
-        {
-            redAvg += red;
-            sleep(20);
-            red = robot.colourSensor.red();
-            x++;
-        }
+        telemetry.update();
 
         //Different conditionals relating the colour sensor output + team Alliance colour.
         if (teamColour.equals("blue")) {
-            if ((redAvg / 3) > blueAvg / 3) {
+            if ((red) > blue) {
                 return .2;
             }
-            else if (redAvg /3 > blueAvg /3 )
+            else if (red < blue)
             {
                 return .9;
             }
@@ -317,13 +321,13 @@ public class TankAutoTurning extends LinearOpMode {
         }
         else if (teamColour.equals("red"))
         {
-            if ((redAvg/3) > blueAvg/3)
-            {
-                return .9;
-            }
-            else if (redAvg/3 < blueAvg/3)
+            if ((red) > blue)
             {
                 return .2;
+            }
+            else if (red < blue)
+            {
+                return .9;
             }
             else {
                 return colourSensorCheck("blue");
@@ -342,6 +346,12 @@ public class TankAutoTurning extends LinearOpMode {
         robot.init(hardwareMap);
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.beaconServo.setPosition(.2);
+
+        robot.device.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
+
+        robot.device.setDigitalChannelState(0, false);
 
         robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -428,16 +438,16 @@ public class TankAutoTurning extends LinearOpMode {
             {
                 if (angleDesired == 0)
                 {
-                    angleDesired = 5;
+                    angleDesired = 35;
                 }
-                turnDrive1 = turningDriveBoolean(.1,  5, angleDesired);
+                turnDrive1 = turningDriveBoolean(.1,  35, angleDesired);
                 driveForward2 = !turnDrive1;
             }
             else if (driveForward2)
             {
                 telemetry.addData("drive2", "");
                 telemetry.update();
-                drive(0,.25, distance(40));
+                drive(0,.25, distance(38));
                 turnDrive2 = true;
                 driveForward2=false;
             }
@@ -453,11 +463,13 @@ public class TankAutoTurning extends LinearOpMode {
                 driveForward3 = true;
                 }
 
+                turnDrive2 = true;
+                driveForward3 = true;
             }
             else if (driveForward3)
             {
-                drive (2,.25,distance(27));
 
+                drive (2,.25,distance(29));
                 driveForward3 = false;
                 colourSensorGo = true;
             }
@@ -465,8 +477,9 @@ public class TankAutoTurning extends LinearOpMode {
             else if (colourSensorGo)
             {
                 robot.beaconServo.setPosition(colourSensorCheck("red"));
-                drive(0,.1,distance(2));
-                drive(2, .1, distance(3));
+
+                drive(2,.3,distance(5));
+                drive(0, .5, distance(40));
                 colourSensorGo = false;
             }
 
