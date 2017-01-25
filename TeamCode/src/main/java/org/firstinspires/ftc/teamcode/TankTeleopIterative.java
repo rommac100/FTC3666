@@ -70,6 +70,7 @@ public class TankTeleopIterative extends OpMode
     private boolean drift = true;
     private double halfSpeed = 1;       //current speed reduction coefficient.  1 at normal power.
     private double flyWheelDelta = .1;
+    private double flyWheelPower = robot.defaultFlyPower;
 
     @Override
     public void init() {
@@ -94,8 +95,10 @@ public class TankTeleopIterative extends OpMode
         robot.marvinPos = .5;
 
         //Having flywheels using PID instead just power.
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //Having flywheels using PID instead just power.
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         //Linear Slide Movement Configuration, Currently Sketchy
@@ -105,7 +108,10 @@ public class TankTeleopIterative extends OpMode
 
     }
 
-
+    public double bangBang(double ticksPerSecond)
+    {
+        return 0;
+    }
 
     @Override
     public void init_loop() {
@@ -117,17 +123,23 @@ public class TankTeleopIterative extends OpMode
     @Override
     public void start() {
         runtime.reset();
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.beaconServo.setPosition(robot.marvinPos);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
 
+
     public void getMaxSpeed()
     {
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -156,9 +168,19 @@ public class TankTeleopIterative extends OpMode
         telemetry.update();
 
     }
+
     @Override
     public void loop() {
 
+        telemetry.addData("Status", "Initialized");
+        telemetry.addData("left",  robot.leftDrivePower);
+        telemetry.addData("right", robot.rightDrivePower);
+        telemetry.addData("liveFly",robot.liveFlyPowerSetting);
+        telemetry.addData("FlyWheel2", robot.flyWheelMotor2.getPower());
+        telemetry.addData("flyWheel1", robot.flyWheelMotor1.getPower());
+        telemetry.addData("flyWheelSysPower", robot.systemFlyPower);
+        telemetry.addData("spin1Motor", robot.spin1Motor.getPower());
+        telemetry.addData("spin2Motor", robot.spin2Motor.getPower());
         //Intake System Joystick Declaration
         robot.innerIntakePower = gamepad2.right_stick_y;
         robot.outerIntakePower = gamepad2.left_stick_y;
@@ -174,6 +196,18 @@ public class TankTeleopIterative extends OpMode
             robot.flyWheelMotor1.setPower(robot.systemFlyPower);
             robot.flyWheelMotor2.setPower(robot.systemFlyPower);
         }
+         else if (gamepad2.dpad_left)
+         {
+             robot.systemFlyPower = .4;
+         }
+         else if (gamepad2.dpad_down)
+         {
+             robot.systemFlyPower = .45;
+         }
+         else if (gamepad2.dpad_up)
+         {
+             robot.systemFlyPower = .55;
+         }
          else if (robot.innerIntakePower > 0)
          {
              robot.flyWheelMotor1.setPower(-.2);
@@ -233,13 +267,13 @@ public class TankTeleopIterative extends OpMode
             robot.rightDrivePower /= maxDriveTrain;
         }
 
-        if (gamepad1.start && direction)
+        if (gamepad1.right_bumper && direction || gamepad1.left_bumper && direction)
         {
             robot.leftDrivePower  = gamepad1.left_stick_y *-1;
             robot.rightDrivePower = gamepad1.right_stick_y *-1;
             direction = false;
         }
-        else if (gamepad1.start && !direction)
+        else if (gamepad1.right_bumper && !direction || gamepad1.left_bumper && !direction)
         {
             robot.leftDrivePower  = gamepad1.left_stick_y;
             robot.rightDrivePower = gamepad1.right_stick_y;
@@ -253,7 +287,7 @@ public class TankTeleopIterative extends OpMode
         robot.spin2Motor.setPower(robot.outerIntakePower);
 
         robot.beaconServo.setPosition(robot.marvinPos);
-
+    telemetry.update();
 
 
     }
@@ -268,6 +302,8 @@ public class TankTeleopIterative extends OpMode
 
         robot.flyWheelMotor1.setPower(0);
         robot.flyWheelMotor2.setPower(0);
+        robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 }

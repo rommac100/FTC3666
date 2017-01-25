@@ -447,7 +447,7 @@ telemetry.update();
             {
                 telemetry.addData("drive2", "");
                 telemetry.update();
-                drive(0,.25, distance(38));
+                drive(0,.25, distance(43));
                 turnDrive2 = true;
                 driveForward2=false;
             }

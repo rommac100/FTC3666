@@ -48,6 +48,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 
 import java.util.Locale;
 
@@ -183,7 +184,7 @@ public class TankAutoGyro extends LinearOpMode {
             power = Range.clip(power, -speed, +speed);
             driveTrain(-power, power);
             idle();
-        } while (opModeIsActive() && error > 0.5);
+        } while (opModeIsActive() && Math.abs(error) > .1);
         driveTrain(0,0);
     }
     public void turnDrive(double angle)
@@ -242,19 +243,16 @@ public class TankAutoGyro extends LinearOpMode {
         }
     }
 
-    public boolean turningDriveBoolean(double power, int angle, float angleDesired)
-    {
+    public boolean turningDriveBoolean(double power, int angle, float angleDesired) {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         boolean temp = true;
 
-        if (angle < 0)
-        {
+        if (angle < 0) {
             robot.leftDrivePower = power;
             robot.rightDrivePower = -power;
 
-            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired)
-            {
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
                 robot.leftDrivePower = 0;
                 robot.rightDrivePower = 0;
 
@@ -263,16 +261,13 @@ public class TankAutoGyro extends LinearOpMode {
             }
             robot.leftMotor.setPower(robot.leftDrivePower);
             robot.rightMotor.setPower(robot.rightDrivePower);
-        }
-        else if (angle > 0)
-        {
+        } else if (angle > 0) {
             robot.leftDrivePower = -power;
             robot.rightDrivePower = power;
 
-            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
-            {
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired) {
                 robot.leftDrivePower = 0;
-                robot.rightDrivePower =0;
+                robot.rightDrivePower = 0;
                 temp = false;
             }
             robot.leftMotor.setPower(robot.leftDrivePower);
@@ -281,21 +276,36 @@ public class TankAutoGyro extends LinearOpMode {
         return temp;
     }
 
-
-
-    public double getHeading() {return AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);}
+    public double getHeading() {return getAngles()[0];}
 
     public void calibrateIMU()
     {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        this.imu.initialize(parameters);
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.useExternalCrystal = true;
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        parameters.pitchMode = BNO055IMU.PitchMode.WINDOWS;
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        imu.initialize(parameters);
     }
+
+    public double[] getAngles() {
+        Quaternion quatAngles = imu.getQuaternionOrientation();
+
+        double w = quatAngles.w;
+        double x = quatAngles.x;
+        double y = quatAngles.y;
+        double z = quatAngles.z;
+
+        // for the Adafruit IMU, yaw and roll are switched
+        double roll = Math.atan2( 2*(w*x + y*z) , 1 - 2*(x*x + y*y) ) * 180.0 / Math.PI;
+        double pitch = Math.asin( 2*(w*y - x*z) ) * 180.0 / Math.PI;
+        double yaw = Math.atan2( 2*(w*z + x*y), 1 - 2*(y*y + z*z) ) * 180.0 / Math.PI;
+
+        return new double[]{yaw, pitch, roll};
+    }
+
     @Override
     public void runOpMode() {
 
@@ -323,8 +333,7 @@ public class TankAutoGyro extends LinearOpMode {
         double tempTime = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-        // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
+
 
         //Step 1: drive forward one foam Pad
         robot.leftMotor.setPower(0);
@@ -335,8 +344,6 @@ public class TankAutoGyro extends LinearOpMode {
 
 
         //telemetry.addData("Angle",angleDesired);
-        robot.leftDrivePower = -.1;
-        robot.rightDrivePower = .1;
 
         float angleDesired = 0;
         float angleDesired2 = 0;
@@ -392,7 +399,8 @@ public class TankAutoGyro extends LinearOpMode {
             }
             else if (turnDrive1)
             {
-               turnP(90,Direction.Counter_Clockwise, 10, .2, .01);
+                turnDrive(80);
+               //turnP(90,Direction.Clockwise, 10, .2, .01);
                 turnDrive1 =false;
             }
 

@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Sat Jan 07 12:37:14 MST 2017
+#Tue Jan 24 12:42:14 MST 2017
 175.set=ASSET
 122.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/RobotConfigTaxonomy.xml
 60.set=ASSET
@@ -103,7 +103,7 @@
 182.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/TextureTeapotBrass.png
 7.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/toolbox_util.js
 91.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/analog_inputs.xml
-98.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/cube_mesh_vertex_shader.glsl
+98.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/xml/pushbotsens.xml
 160.set=ANDROID_RESOURCE
 105.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 152.set=ASSET
@@ -113,7 +113,7 @@
 144.set=ANDROID_RESOURCE
 7.set=ASSET
 159.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
-58.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/matrices.xml
+58.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/analog_output_device.xml
 136.set=ASSET
 68.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 128.set=ASSET
@@ -143,7 +143,7 @@
 111.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blockly/blocks_compressed.js
 121.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
 20.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/shape.xml
-118.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/nxtstartupsound.wav
+118.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/header.xml
 128.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 27.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blockly/media/quote1.png
 165.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/images/ftcAnalogOutput.png
@@ -185,17 +185,17 @@
 181.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/chimeconnect.wav
 90.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/ultrasonic_sensor.js
 6.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/servo_list.xml
-97.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/xml/pushbotsens.xml
+97.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/cube_mesh_vertex_shader.glsl
 150.set=ANDROID_RESOURCE
 104.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 142.set=ASSET
 141.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/menu/ftc_robot_controller.xml
 151.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
 5.set=ASSET
-50.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/activity_blocks.xml
+50.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/orange_warning.xml
 134.set=ASSET
 158.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
-57.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/analog_output_device.xml
+57.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/matrices.xml
 126.set=ASSET
 67.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 118.set=ANDROID_RESOURCE
@@ -224,7 +224,7 @@
 88.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 110.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/Buildings.jpeg
 120.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
-117.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/header.xml
+117.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/nxtstartupsound.wav
 127.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
 26.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/comment.js
 164.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/elapsed_time.js
@@ -262,7 +262,7 @@
 42.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/activity_programming_mode.xml
 180.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blockly/LICENSE
 5.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/images/ftcRobotController.png
-49.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/orange_warning.xml
+49.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/chimedisconnect.wav
 96.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/FtcBlocks.html
 140.set=ASSET
 103.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
@@ -338,7 +338,7 @@
 139.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/gyro_sensor.js
 4.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blockly/media/disconnect.ogg
 149.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_
-48.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/raw/chimedisconnect.wav
+48.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/res/resources-debug.ap_/res/layout/activity_blocks.xml
 16.base=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug
 95.file=/home/rommac100/Documents/ftc_app_masterWorking/TeamCode/build/intermediates/assets/debug/blocks/mr_i2c_compass_sensor.js
 1.set=ANDROID_RESOURCE
