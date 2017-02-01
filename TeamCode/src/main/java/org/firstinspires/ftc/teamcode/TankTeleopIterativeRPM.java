@@ -1,59 +1,15 @@
-/*
-Copyright (c) 2016 Robert Atkinson
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted (subject to the limitations in the disclaimer below) provided that
-the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list
-of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-Neither the name of Robert Atkinson nor the names of his contributors may be used to
-endorse or promote products derived from this software without specific prior
-written permission.
-
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
-LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESSFOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@TeleOp(name="Hardware Tank: TankTeleOpIterative", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Hardware Tank: TankTeleOpRPM", group="Iterative Opmode")
 public class TankTeleopIterativeRPM extends OpMode
 {
     /* Declare OpMode members. */
@@ -63,7 +19,6 @@ public class TankTeleopIterativeRPM extends OpMode
 
     private double maxDriveTrain;
     private double maxIntakeSystem;
-    private boolean direction = true; // true equals normal direction
     private boolean drift = true;
     private double halfSpeed = 1;       //current speed reduction coefficient.  1 at normal power.
     private double flyWheelDelta = .1;
@@ -95,7 +50,7 @@ public class TankTeleopIterativeRPM extends OpMode
 
     private boolean firstCross;
 
-    private double tolerance = 0.5e-7;
+    private double tolerance = 0.5e-6;
 
     private double targetVoltage = 12.5;
     private double voltage;
@@ -120,7 +75,7 @@ public class TankTeleopIterativeRPM extends OpMode
         robot.innerIntakePower = 0;
         robot.outerIntakePower = 0;
         robot.systemFlyPower = robot.defaultFlyPower;
-        robot.marvinPos = .5;
+
 
         //Having flywheels using PID instead just power.
         //Having flywheels using PID instead just power.
@@ -135,10 +90,25 @@ public class TankTeleopIterativeRPM extends OpMode
         robot.rightDrivePower = gamepad1.right_stick_y;
 
     }
-
-    public double bangBang(double ticksPerSecond)
+//Basically adjusts the power based upon the current speed which is based upon encoder ticks over time.
+    public void bangBang()
     {
-        return 0;
+        fVelocityTime = System.nanoTime();
+        fEncoder = robot.flyWheelMotor1.getCurrentPosition();
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+
+        if(fVelocity >= (fTarget + tolerance))
+        {
+            setFPower(robot.minBangValue);
+        }
+
+        else if(fVelocity < (fTarget - tolerance))
+        {
+            setFPower(robot.maxBangValue);
+        }
+
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
     }
 
     private void setFPower(double power)
@@ -146,7 +116,7 @@ public class TankTeleopIterativeRPM extends OpMode
         robot.flyWheelMotor1.setPower(power);
         robot.flyWheelMotor2.setPower(power);
     }
-
+//prints current velocity of the flywheels.
     private void printVelocity()
     {
         fVelocity = System.nanoTime();
@@ -158,8 +128,82 @@ public class TankTeleopIterativeRPM extends OpMode
 
     }
 
+    private void calculatePID()
+    {
+        fVelocityTime = System.nanoTime();
+        fEncoder = robot.flyWheelMotor1.getCurrentPosition();
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fError = fTarget - fVelocity;
+
+        integral += fError;
+        if(fError == 0)
+        {
+            integral = 0;
+        }
+
+        if(Math.abs(fError) > 50)
+        {
+            integral = 0;
+        }
+
+        derivative = fError - fLastError;
+
+        fLastError = fError;
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
+
+        motorOut = (kP * fError) + (kI * integral) + (kD * derivative);
+
+        motorOut = Range.clip(motorOut, 0.0, 1.0);
+
+        telemetry.addData("1", "kP " + (kP * fError));
+        telemetry.addData("2", "Error " + fError);
+        telemetry.addData("3", "Time " + fVelocityTime);
+        telemetry.addData("4", "Encoder " + fEncoder);
+        telemetry.addData("5", "Last Encoder " + fLastEncoder);
+        telemetry.addData("6", "Encoder Change " + (fEncoder - fLastEncoder));
+        telemetry.addData("7", "Time Change " + (fVelocityTime - fLastVelocityTime));
+        telemetry.addData("8", "Velocity " + fVelocity);
+        telemetry.addData("9", "Result " + motorOut);
+        telemetry.update();
+
+        setFPower(motorOut);
+    }
+
     @Override
     public void init_loop() {
+    }
+
+    public void adjustPID()
+    {
+        if(gamepad2.dpad_up)
+        {
+            kP += (1.0 * place);
+        }
+
+        if(gamepad2.dpad_down)
+        {
+            kP -= (1.0 * place);
+        }
+
+        if(gamepad1.dpad_left)
+        {
+            place *= 10.0;
+        }
+
+        if(gamepad2.left_bumper)
+        {
+            place *= 0.1;
+        }
+    }
+//A backup just incase bang bang doesn't work, we use this instead which compensates flywheel speed based upon battery power.
+    public void voltageProportional()
+    {
+        double kP = .15;
+        double error = targetVoltage - voltage;
+        motorOut = (error * kP) + .25;
+        motorOut = Range.clip(motorOut, 0, 1);
+        setFPower(motorOut);
     }
 
     /*
@@ -170,7 +214,6 @@ public class TankTeleopIterativeRPM extends OpMode
         runtime.reset();
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.beaconServo.setPosition(robot.marvinPos);
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -180,38 +223,49 @@ public class TankTeleopIterativeRPM extends OpMode
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
 
-
-    public void getMaxSpeed()
+    public double colourSensorCheck(String teamColour)
     {
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.flyWheelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        int red = robot.colourSensor.red();
+        int blue = robot.colourSensor.blue();
 
-        double tempTime = runtime.seconds();
-        tempTime+=30;
-        while(runtime.seconds() < tempTime)
-        {
-            robot.flyWheelMotor1.setPower(1.00);
-            robot.flyWheelMotor2.setPower(1.00);
-        }
+        int x = 0;
 
-        robot.flyWheelMotor1.setPower(0.0);
-        robot.flyWheelMotor2.setPower(0.0);
 
-        int flyWheelPos1 = robot.flyWheelMotor1.getCurrentPosition();
-        int flyWheelPos2 = robot.flyWheelMotor2.getCurrentPosition();
-
-        flyWheelPos1 = flyWheelPos1/30;
-        flyWheelPos2 = flyWheelPos2/30;
-
-        telemetry.addData("flyWheelPos1",flyWheelPos1);
-        telemetry.addData("flyWheelPos2",flyWheelPos2);
+        //averaging loop
+        telemetry.addData("redVal", red);
+        telemetry.addData("blueVal", blue);
 
         telemetry.update();
 
+        //Different conditionals relating the colour sensor output + team Alliance colour.
+        if (teamColour.equals("blue")) {
+            if ((red) > blue) {
+                return .2;
+            }
+            else if (red < blue)
+            {
+                return .9;
+            }
+            else
+            {
+                return colourSensorCheck("blue");
+            }
+        }
+        else if (teamColour.equals("red"))
+        {
+            if ((red) > blue)
+            {
+                return .2;
+            }
+            else if (red < blue)
+            {
+                return .9;
+            }
+            else {
+                return colourSensorCheck("blue");
+            }
+        }
+        return .5;
     }
 
     @Override
@@ -231,7 +285,12 @@ public class TankTeleopIterativeRPM extends OpMode
         telemetry.addData("6", "Encoder Change " + (fEncoder - fLastEncoder));
         telemetry.addData("7", "Time Change " + (fVelocityTime - fLastVelocityTime));
         telemetry.addData("8", "Velocity " + fVelocity);
-        //Intake System Joystick Declaration
+       //All Telemetry decleration
+
+        printVelocity();
+
+
+         //adjustPID();
         robot.innerIntakePower = gamepad2.right_stick_y;
         robot.outerIntakePower = gamepad2.left_stick_y;
 
@@ -243,21 +302,13 @@ public class TankTeleopIterativeRPM extends OpMode
          if (gamepad2.dpad_right) {
             robot.systemFlyPower = robot.defaultFlyPower;
         } else if (gamepad2.right_trigger > 0) {
-            robot.flyWheelMotor1.setPower(robot.systemFlyPower);
-            robot.flyWheelMotor2.setPower(robot.systemFlyPower);
+             bangBang();
+             //voltageProportional();
+             //flagWave();
+
+             //robot.flyWheelMotor1.setPower(robot.systemFlyPower);
+            //robot.flyWheelMotor2.setPower(robot.systemFlyPower);
         }
-         else if (gamepad2.dpad_left)
-         {
-             robot.systemFlyPower = .4;
-         }
-         else if (gamepad2.dpad_down)
-         {
-             robot.systemFlyPower = .45;
-         }
-         else if (gamepad2.dpad_up)
-         {
-             robot.systemFlyPower = .55;
-         }
          else if (robot.innerIntakePower > 0)
          {
              robot.flyWheelMotor1.setPower(-.2);
@@ -268,7 +319,10 @@ public class TankTeleopIterativeRPM extends OpMode
             robot.flyWheelMotor2.setPower(0);
         }
 
-
+        if (gamepad1.dpad_up)
+        {
+            calculatePID();
+        }
 
 
 
@@ -294,11 +348,6 @@ public class TankTeleopIterativeRPM extends OpMode
         }
 
         //Marvin Servo Control, using 180 degree Servo on the Intake side of the Robot
-        if (gamepad1.left_trigger > 0) {
-            robot.marvinPos = .9;
-        } else if (gamepad1.right_trigger > 0) {
-            robot.marvinPos = .2;
-        }
 
         //Normalization of Intake System values, since it is driven by joysticks
         maxIntakeSystem = Math.max(Math.abs(robot.innerIntakePower), Math.abs(robot.outerIntakePower));
@@ -317,17 +366,17 @@ public class TankTeleopIterativeRPM extends OpMode
             robot.rightDrivePower /= maxDriveTrain;
         }
 
-        if (gamepad1.right_bumper && direction || gamepad1.left_bumper && direction)
+        //Toggle Reverse button for Driver 1
+        if (gamepad1.right_bumper)
         {
-            robot.leftDrivePower  = gamepad1.left_stick_y *-1;
-            robot.rightDrivePower = gamepad1.right_stick_y *-1;
-            direction = false;
+            robot.leftDrivePower  = gamepad1.right_stick_y *-1;
+            robot.rightDrivePower = gamepad1.left_stick_y *-1;
+
         }
-        else if (gamepad1.right_bumper && !direction || gamepad1.left_bumper && !direction)
+        else if (gamepad1.left_bumper)
         {
             robot.leftDrivePower  = gamepad1.left_stick_y;
             robot.rightDrivePower = gamepad1.right_stick_y;
-            direction = true;
         }
 
         robot.leftMotor.setPower(robot.leftDrivePower*halfSpeed);
@@ -336,7 +385,6 @@ public class TankTeleopIterativeRPM extends OpMode
         robot.spin1Motor.setPower(robot.innerIntakePower);
         robot.spin2Motor.setPower(robot.outerIntakePower);
 
-        robot.beaconServo.setPosition(robot.marvinPos);
     telemetry.update();
 
 

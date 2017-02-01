@@ -38,6 +38,7 @@ public class HardwareTank
     public DcMotor  flyWheelMotor1 = null;
     public DcMotor  flyWheelMotor2 = null;
     public Servo    beaconServo = null;
+    public Servo    flagServo = null;
     public DeviceInterfaceModule device = null;
     public ColorSensor colourSensor = null;
     public final double distancePerRev = 18.84;
@@ -55,6 +56,9 @@ public class HardwareTank
                                         //should be less than one rotation right?
     public int ledChannel = 5;
 
+    public double minBangValue = 0;// for bangbang for the flywheels
+    public double maxBangValue = 1; // for bangbang for the flywheels
+
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
     private ElapsedTime period  = new ElapsedTime();
@@ -69,7 +73,6 @@ public class HardwareTank
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        linearSlide = hwMap.dcMotor.get("linear_slide");
         leftMotor   = hwMap.dcMotor.get("left_drive");
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor  = hwMap.dcMotor.get("right_drive");
@@ -86,7 +89,6 @@ public class HardwareTank
         spin1Motor.setDirection(DcMotor.Direction.REVERSE);
         spin2Motor.setDirection(DcMotor.Direction.REVERSE);
         flyWheelMotor1.setDirection(DcMotor.Direction.REVERSE);
-        beaconServo = hwMap.servo.get("beaconS");
         device = hwMap.deviceInterfaceModule.get("deviceINT");
         colourSensor = hwMap.colorSensor.get("colour_sensor");
         // Set all motors to zero power
@@ -96,7 +98,6 @@ public class HardwareTank
         spin2Motor.setPower(0);
         flyWheelMotor1.setPower(0);
         flyWheelMotor2.setPower(0);
-        beaconServo.setPosition(.5);
 
         flyWheelMotor1.setMaxSpeed(1200);
         flyWheelMotor2.setMaxSpeed(1200);

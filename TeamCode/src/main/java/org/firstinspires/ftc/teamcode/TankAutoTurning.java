@@ -1,35 +1,4 @@
-/*
-Copyright (c) 2016 Robert Atkinson
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted (subject to the limitations in the disclaimer below) provided that
-the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list
-of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-Neither the name of Robert Atkinson nor the names of his contributors may be used to
-endorse or promote products derived from this software without specific prior
-written permission.
-
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
-LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESSFOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
@@ -59,26 +28,11 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
 import java.util.Locale;
 
-/**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+
+/*
+This auto drives forward, fires two projectiles, and then goes turns and attempts to capture the beacon. Afterwards it attempts to park and knock off the capball.
  */
+
 @Autonomous(name="Tank: AutotomousTurning", group="Tank")
 public class TankAutoTurning extends LinearOpMode {
 
@@ -93,6 +47,15 @@ public class TankAutoTurning extends LinearOpMode {
         return (int)(dis*robot.ticksPerInch);
     }
 
+    public enum DIRECTION {
+        FORWARD(+0.3), REVERSE(.25), Clockwise(.25), Counter_Clockwise(-.25);
+        public final double value;
+
+        DIRECTION(double value) {
+            this.value = value;
+        }
+    }
+
     // The IMU sensor object
     BNO055IMU imu;
 
@@ -100,116 +63,65 @@ public class TankAutoTurning extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
 
+    private int fEncoder = 0;
+    private int fLastEncoder = 0;
 
-    //0 = forward, 2 = reverse
-    public void drive(int direction, double power, int ticks)
-    {
-        telemetry.addData("Drive", direction);
-        telemetry.update();
+    private long fVelocityTime = 0;
+    private long fLastVelocityTime = 0;
+
+    private double motorOut = 0.0;
+    private double fTarget = 7.5e-7;
+    private double fVelocity = 0.0;
+    private double fError = 0.0;
+    private double fLastError = 0.0;
+    private double tolerance = 0.5e-7;
+
+
+    public void drive(DIRECTION direction, int ticks) {
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        robot.leftMotor.setTargetPosition(ticks);
-        robot.rightMotor.setTargetPosition(ticks);
-        double timeTemp = runtime.seconds()+10;
 
-        centerQ = robot.device.getAnalogInputVoltage(0);
-        if (direction ==0)
-        {
-            robot.leftMotor.setPower(power);
-            robot.rightMotor.setPower(power);
-            while(robot.leftMotor.isBusy() && opModeIsActive())
-            {
+        double timeTemp = runtime.seconds() + 10;
+        switch (direction) {
+            case FORWARD:
+                robot.leftMotor.setTargetPosition(ticks);
+                robot.rightMotor.setTargetPosition(ticks);
+                robot.leftMotor.setPower(DIRECTION.FORWARD.value);
+                robot.rightMotor.setPower(DIRECTION.FORWARD.value);
+                while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive()) {
 
-            }
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
+                }
+                robot.leftMotor.setPower(0);
+                robot.rightMotor.setPower(0);
 
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                break;
+            case REVERSE:
+                robot.leftMotor.setTargetPosition(-ticks);
+                robot.rightMotor.setTargetPosition(-ticks);
+
+                robot.leftMotor.setPower(DIRECTION.FORWARD.value);
+                robot.rightMotor.setPower(DIRECTION.FORWARD.value);
+                while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive()) {
+                    telemetry.addData("motorLeft Pos", robot.leftMotor.getCurrentPosition());
+                    telemetry.update();
+                }
+
+                robot.leftMotor.setPower(0);
+                robot.rightMotor.setPower(0);
+
+                robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
         }
-        else if (direction == 1)
-        {
-            telemetry.addData("case 1", "");
-            telemetry.update();
-            telemetry.addData("centerQ", centerQ);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.leftMotor.setPower(power);
-            robot.rightMotor.setPower(power);
-            while (opModeIsActive() &&  centerQ < .2);
-            {
-telemetry.update();
-            }
-            robot.leftMotor.setPower(0);
-            robot.leftMotor.setPower(0);
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-        else if (direction == 2)
-        {
-            telemetry.addData("Case 2", "");
-            telemetry.update();
-            robot.leftMotor.setTargetPosition(-ticks);
-            robot.rightMotor.setTargetPosition(-ticks);
-            robot.leftMotor.setPower(power);
-            robot.rightMotor.setPower(power);
-
-            while(robot.leftMotor.isBusy() && opModeIsActive())
-            {
-                telemetry.addData("motorLeft Pwr", robot.leftMotor.getPower());
-            }
-
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
-
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-
     }
-
-        public void betterTurn(double power, float angleDesired)
-        {
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            boolean temp = true;
-            float angle;
-            int interval = 3;
-            double temptime=1;
-            while(temp)
-            {
-
-                angle = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle);
-                if (angle < angleDesired)
-                {
-                    robot.leftDrivePower = -power;
-                    robot.rightDrivePower = power;
-
-
-                    robot.leftMotor.setPower(robot.leftDrivePower);
-                    robot.rightMotor.setPower(robot.rightDrivePower);
-                }
-                else if (angle > angleDesired)
-                {
-                    robot.leftDrivePower = power;
-                    robot.rightDrivePower = -power;
-
-
-                    robot.leftMotor.setPower(robot.leftDrivePower);
-                    robot.rightMotor.setPower(robot.rightDrivePower);
-                }
-
-            }
-
-        }
 
 
     public boolean turningDriveBoolean(double power, int angle, float angleDesired)
@@ -250,45 +162,23 @@ telemetry.update();
         return temp;
     }
 
-    public void turningDrive(double power, int angle)
-    {
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    private void setFPower(double power) {
+        robot.flyWheelMotor1.setPower(power);
+        robot.flyWheelMotor2.setPower(power);
+    }
 
-        float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+angle;
-        if (angle < 0) {
-            robot.leftDrivePower = power;
-            robot.rightDrivePower = -power;
-
-
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                }
-                robot.leftMotor.setPower(robot.leftDrivePower);
-                robot.rightMotor.setPower(robot.rightDrivePower);
-
-                telemetry.update();
-            }
-
-        else
-        {
-            robot.leftDrivePower = -power;
-            robot.rightDrivePower = power;
-
-                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
-                {
-                    robot.leftDrivePower = 0;
-                    robot.rightDrivePower = 0;
-                }
-                robot.leftMotor.setPower(robot.leftDrivePower);
-                robot.rightMotor.setPower(robot.rightDrivePower);
-                telemetry.update();
-
-
+    public void bangBang() {
+        fVelocityTime = System.nanoTime();
+        fEncoder = robot.flyWheelMotor1.getCurrentPosition();
+        fVelocity = (double) (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        if (fVelocity >= (fTarget + tolerance)) {
+            setFPower(.35);
+        } else if (fVelocity < (fTarget - tolerance)) {
+            setFPower(.44);
         }
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
     }
 
     public double colourSensorCheck(String teamColour)
@@ -336,6 +226,20 @@ telemetry.update();
     return .5;
     }
 
+    public void flyWheelShooter(double duration) {
+
+        while (runtime.seconds() < duration && opModeIsActive()) {
+            bangBang();
+            sleep(500);
+            robot.spin1Motor.setPower(.4);
+            bangBang();
+        }
+
+        setFPower(0);
+        robot.spin1Motor.setPower(0);
+
+    }
+
     @Override
     public void runOpMode() {
 
@@ -346,8 +250,6 @@ telemetry.update();
         robot.init(hardwareMap);
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        robot.beaconServo.setPosition(.2);
 
         robot.device.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
 
@@ -377,9 +279,8 @@ telemetry.update();
         waitForStart();
         angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         centerQ= robot.device.getAnalogInputVoltage(4);
-        // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
-        //Step 1: drive forward one foam Pad
+
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
@@ -404,7 +305,7 @@ telemetry.update();
 
             if (driveForward1)
             {
-                drive(0, .25, distance(22));
+                drive(DIRECTION.FORWARD, distance(22));
 
                 flywheels = true;
                 driveForward1=false;
@@ -412,27 +313,9 @@ telemetry.update();
             }
             else if (flywheels)
             {
-                if (desiredTime == 0)
-                {
-                    desiredTime = runtime.seconds() + 10;
-                }
-                robot.flyWheelMotor1.setPower(robot.defaultFlyPower);
-                robot.flyWheelMotor2.setPower(robot.defaultFlyPower);
-
-                if (runtime.seconds() > desiredTime -8)
-                {
-                    robot.spin1Motor.setPower(.4);
-                }
-                if (runtime.seconds() >= desiredTime)
-                {
-                    robot.flyWheelMotor1.setPower(0);
-                    robot.flyWheelMotor2.setPower(0);
-
-                    robot.spin1Motor.setPower(0);
-
+                flyWheelShooter(10);
                     turnDrive1 = true;
                     flywheels = false;
-                }
             }
             else if (turnDrive1)
             {
@@ -447,7 +330,7 @@ telemetry.update();
             {
                 telemetry.addData("drive2", "");
                 telemetry.update();
-                drive(0,.25, distance(43));
+                drive(DIRECTION.FORWARD, distance(43));
                 turnDrive2 = true;
                 driveForward2=false;
             }
@@ -469,17 +352,16 @@ telemetry.update();
             else if (driveForward3)
             {
 
-                drive (2,.25,distance(29));
-                driveForward3 = false;
+                drive(DIRECTION.REVERSE,distance(29));
                 colourSensorGo = true;
+                driveForward3 = false;
+
             }
 
             else if (colourSensorGo)
             {
-                robot.beaconServo.setPosition(colourSensorCheck("red"));
-
-                drive(2,.3,distance(5));
-                drive(0, .5, distance(40));
+                drive(DIRECTION.REVERSE, distance(5));
+                drive(DIRECTION.FORWARD, distance(40));
                 colourSensorGo = false;
             }
 

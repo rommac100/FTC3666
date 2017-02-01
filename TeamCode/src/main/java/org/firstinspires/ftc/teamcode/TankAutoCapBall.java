@@ -36,46 +36,52 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 
-/**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+
+/*
+
+This Autonomous uses a angle that is placed done by the driver, then drives forward, and fires two projectiles, and knocks off Cap ball, and attempt to park.
  */
 
 @Autonomous(name="Tank: AutotomousCapBall", group="Tank")
 public class TankAutoCapBall extends LinearOpMode {
 
     /* Declare OpMode members. */
-    HardwareTank robot   = new HardwareTank();
-    private ElapsedTime     runtime = new ElapsedTime();
+    HardwareTank robot = new HardwareTank();
+    private ElapsedTime runtime = new ElapsedTime();
 
-    public int distance(double dis)
-    {
-        return (int)(dis*robot.ticksPerInch);
+    public int distance(double dis) {
+        return (int) (dis * robot.ticksPerInch);
     }
 
 
-    //0 = forward, 2 = reverse
-    public void drive(int direction, double power, int ticks)
-    {
+    //Enumeration for Direction choices
+    public enum DIRECTION {
+        FORWARD(+0.3), REVERSE(.25), Clockwise(.25), Counter_Clockwise(-.25);
+        public final double value;
+
+        DIRECTION(double value) {
+            this.value = value;
+        }
+    }
+
+    private int fEncoder = 0;
+    private int fLastEncoder = 0;
+
+    private long fVelocityTime = 0;
+    private long fLastVelocityTime = 0;
+
+    private double motorOut = 0.0;
+    private double fTarget = 7.5e-7;
+    private double fVelocity = 0.0;
+    private double fError = 0.0;
+    private double fLastError = 0.0;
+    private double tolerance = 0.5e-7;
+
+
+    //Our Drive forward method. Uses a declared Enumeration for Direction choices.
+    public void drive(DIRECTION direction, int ticks) {
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -84,14 +90,12 @@ public class TankAutoCapBall extends LinearOpMode {
 
         robot.leftMotor.setTargetPosition(ticks);
         robot.rightMotor.setTargetPosition(ticks);
-        switch (direction)
-        {
-            case 0:
-                robot.leftMotor.setPower(power);
-                robot.rightMotor.setPower(power);
-                while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
-                {
-
+        double timeTemp = runtime.seconds() + 10;
+        switch (direction) {
+            case FORWARD:
+                robot.leftMotor.setPower(DIRECTION.FORWARD.value);
+                robot.rightMotor.setPower(DIRECTION.FORWARD.value);
+                while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive()) {
 
                 }
                 robot.leftMotor.setPower(0);
@@ -100,17 +104,13 @@ public class TankAutoCapBall extends LinearOpMode {
                 robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 break;
-            case 1:
-                robot.leftMotor.setPower(power);
-                robot.rightMotor.setPower(-1*power);
-                break;
-            case 2:
-                robot.leftMotor.setPower(-1*power);
-                robot.rightMotor.setPower(-1*power);
-                double temp = runtime.seconds()+8;
-                while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive() && runtime.seconds() < temp)
-                {
+            case REVERSE:
+                robot.leftMotor.setTargetPosition(-ticks);
+                robot.rightMotor.setTargetPosition(-ticks);
 
+                robot.leftMotor.setPower(DIRECTION.REVERSE.value);
+                robot.rightMotor.setPower(DIRECTION.REVERSE.value);
+                while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive()) {
                     telemetry.addData("motorLeft Pos", robot.leftMotor.getCurrentPosition());
                     telemetry.update();
                 }
@@ -123,13 +123,44 @@ public class TankAutoCapBall extends LinearOpMode {
                 robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
-            case 3:
-                robot.leftMotor.setPower(-1*power);
-                robot.leftMotor.setPower(1*power);
-                break;
-
-
         }
+    }
+
+
+    //Flywheel shooter method, has the passed in parameter of the duration it should be running.
+    public void flyWheelShooter(double duration) {
+
+        duration += runtime.seconds();
+        while (runtime.seconds() < duration && opModeIsActive()) {
+                bangBang();
+            sleep(500);
+                robot.spin1Motor.setPower(.42);
+                bangBang();
+            }
+
+        setFPower(0);
+        robot.spin1Motor.setPower(0);
+
+    }
+
+    private void setFPower(double power) {
+        robot.flyWheelMotor1.setPower(power);
+        robot.flyWheelMotor2.setPower(power);
+    }
+
+//Our compensation algorithm of the flywheel power, by adjusting the power of the flywheel based upon their velocity (by keeping track of encoder ticks).
+    public void bangBang() {
+        fVelocityTime = System.nanoTime();
+        fEncoder = robot.flyWheelMotor1.getCurrentPosition();
+        fVelocity = (double) (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        if (fVelocity >= (fTarget + tolerance)) {
+            setFPower(robot.minBangValue);
+        } else if (fVelocity < (fTarget - tolerance)) {
+            setFPower(robot.maxBangValue);
+        }
+
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
     }
 
     @Override
@@ -140,8 +171,8 @@ public class TankAutoCapBall extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -153,43 +184,24 @@ public class TankAutoCapBall extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-        // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
-
-
-        //Step 1: drive forward one foam Pad
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
-            drive(2, .25, distance(22));
-        sleep(1000);
-            double tempTime = runtime.seconds() + 8;
-        while (runtime.seconds() < tempTime)
-        {
-            robot.flyWheelMotor1.setPower(0.7);
-            robot.flyWheelMotor2.setPower(0.7);
+        if (opModeIsActive()) {
 
-            if (runtime.seconds() > tempTime +3)
-            {
-                robot.spin2Motor.setPower(.4);
-            }
-        }
-            robot.spin1Motor.setPower(0);
-            robot.spin2Motor.setPower(0);
-            robot.flyWheelMotor1.setPower(0);
-            robot.flyWheelMotor2.setPower(0);
 
-            //sleep(2000);
-            drive(2, 1, distance(35));
+            drive(DIRECTION.FORWARD, distance(42));
+            sleep(1000);
+            flyWheelShooter(10);
+            drive(DIRECTION.FORWARD, distance(38));
 
 
             robot.leftMotor.setPower(0);
             robot.rightMotor.setPower(0);
-            // Step 4:  Stop and close the claw
-
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
             //sleep(1000);
+        }
     }
 }

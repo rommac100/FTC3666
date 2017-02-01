@@ -184,7 +184,7 @@ public class TankAutoGyro extends LinearOpMode {
             power = Range.clip(power, -speed, +speed);
             driveTrain(-power, power);
             idle();
-        } while (opModeIsActive() && Math.abs(error) > .1);
+        } while (opModeIsActive() && Math.abs(error) > .5);
         driveTrain(0,0);
     }
     public void turnDrive(double angle)
@@ -399,8 +399,8 @@ public class TankAutoGyro extends LinearOpMode {
             }
             else if (turnDrive1)
             {
-                turnDrive(80);
-               //turnP(90,Direction.Clockwise, 10, .2, .01);
+                //turnDrive(73);
+               turnP(90,Direction.Clockwise, 10, .2, 1);
                 turnDrive1 =false;
             }
 
