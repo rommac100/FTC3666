@@ -111,59 +111,11 @@ public class HardwareTank
     }
 
 
-    public void drive(int direction, double power, int ticks, ElapsedTime runtime, LinearOpMode linear)
+
+    public void driveMotors(double powerLeft, double powerRight)
     {
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftMotor.setTargetPosition(ticks);
-        rightMotor.setTargetPosition(ticks);
-        double timeTemp = runtime.seconds()+10;
-        switch (direction)
-        {
-            case 0:
-                leftMotor.setPower(power);
-                rightMotor.setPower(power);
-                while(leftMotor.isBusy() && rightMotor.isBusy())
-                {
-
-                }
-                leftMotor.setPower(0);
-                rightMotor.setPower(0);
-
-                leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                break;
-            case 1:
-                leftMotor.setPower(power);
-                rightMotor.setPower(-1*power);
-                break;
-            case 2:
-                leftMotor.setPower(-1*power);
-                rightMotor.setPower(-1*power);
-                while(leftMotor.isBusy() && rightMotor.isBusy() && linear.opModeIsActive() && runtime.seconds() < timeTemp)
-                {
-
-                }
-
-                leftMotor.setPower(0);
-                rightMotor.setPower(0);
-
-                leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                break;
-            case 3:
-                leftMotor.setPower(-1*power);
-                leftMotor.setPower(1*power);
-                break;
-
-
-        }
+        leftMotor.setPower(powerLeft);
+        rightMotor.setPower(powerRight);
     }
 
     /***

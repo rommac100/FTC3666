@@ -135,6 +135,11 @@ public class TankAutoGyro extends LinearOpMode {
                 robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 break;
+            case Counter_Clockwise:
+                turnDrive(ticks);
+                break;
+            case Clockwise:
+                turnDrive(ticks);
             case REVERSE:
                 robot.leftMotor.setTargetPosition(-ticks);
                 robot.rightMotor.setTargetPosition(-ticks);
