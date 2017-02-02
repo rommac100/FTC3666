@@ -32,12 +32,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.util.Locale;
 
 
 /*
@@ -45,7 +55,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwareTank;
 This Autonomous uses a angle that is placed done by the driver, then drives forward, and fires two projectiles, and knocks off Cap ball, and attempt to park.
  */
 
-@Autonomous(name="Tank: AutotomousCapBallWait", group="Tank")
+@Autonomous(name="Tank: AutoByron", group="Tank")
 public class TankAutoTemplate extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -66,6 +76,12 @@ public class TankAutoTemplate extends LinearOpMode {
             this.value = value;
         }
     }
+
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
 
     private int fEncoder = 0;
     private int fLastEncoder = 0;
@@ -164,8 +180,104 @@ public class TankAutoTemplate extends LinearOpMode {
         fLastVelocityTime = fVelocityTime;
     }
 
+
+    public boolean turningDriveBoolean(double power, int angle, float angleDesired)
+    {
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        boolean temp = true;
+
+        if (angle < 0)
+        {
+            robot.leftDrivePower = -power;
+            robot.rightDrivePower = power;
+
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired)
+            {
+                robot.leftDrivePower = 0;
+                robot.rightDrivePower = 0;
+                temp = false;
+
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+        else if (angle > 0)
+        {
+            robot.leftDrivePower = power;
+            robot.rightDrivePower = -power;
+
+            if (AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle) > angleDesired)
+            {
+                robot.leftDrivePower = 0;
+                robot.rightDrivePower =0;
+                temp = false;
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+        return temp;
+    }
+
+    public void turningDrive(double power, int angle)
+    {
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        float angleDesired = AngleUnit.DEGREES.fromUnit(angles.angleUnit,angles.firstAngle)+angle;
+
+        if (angle < 0) {
+            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired && opModeIsActive()) {
+                robot.leftDrivePower = power;
+                robot.rightDrivePower = -power;
+
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < angleDesired) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                    robot.leftMotor.setPower(robot.leftDrivePower);
+                    robot.rightMotor.setPower(robot.rightDrivePower);
+                    break;
+                }
+
+                robot.leftMotor.setPower(robot.leftDrivePower);
+                robot.rightMotor.setPower(robot.rightDrivePower);
+
+                telemetry.update();
+
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+
+        else {
+            while (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired && opModeIsActive()) {
+                robot.leftDrivePower = -power;
+                robot.rightDrivePower = power;
+
+                if (AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) > angleDesired) {
+                    robot.leftDrivePower = 0;
+                    robot.rightDrivePower = 0;
+                    robot.leftMotor.setPower(robot.leftDrivePower);
+                    robot.rightMotor.setPower(robot.rightDrivePower);
+                    break;
+                }
+                robot.leftMotor.setPower(robot.leftDrivePower);
+                robot.rightMotor.setPower(robot.rightDrivePower);
+                telemetry.update();
+
+
+            }
+            robot.leftMotor.setPower(robot.leftDrivePower);
+            robot.rightMotor.setPower(robot.rightDrivePower);
+        }
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     @Override
-    public void runOpMode() {
+    public void runOpMode()
+    {
+
 
         /*
          * Initialize the drive system variables.
@@ -183,12 +295,33 @@ public class TankAutoTemplate extends LinearOpMode {
         telemetry.addData("Alliance Colour", "Red or Blue");
         telemetry.update();
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+        angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
         runtime.reset();
         if (opModeIsActive()) {
+
+            //drive(DIRECTION.REVERSE, distance(20));
+            //flyWheelShooter(6);
+
+            turnWithoutEncoders(DIRECTION.Counter_Clockwise, 45);
+            drive(DIRECTION.FORWARD, distance(-8));
+            drive(DIRECTION.FORWARD, distance(4));
+
+
 
 
             robot.leftMotor.setPower(0);
@@ -198,4 +331,106 @@ public class TankAutoTemplate extends LinearOpMode {
             telemetry.update();
         }
     }
+
+    public void turnWithoutEncoders(DIRECTION direction, double angle)
+    {
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        if (direction == DIRECTION.Counter_Clockwise)
+        {
+            double tempTime = runtime.seconds() + 2.85;
+
+            robot.leftMotor.setPower(-.555);
+            robot.rightMotor.setPower(-.8);
+            while (runtime.seconds() <tempTime && opModeIsActive())
+            {
+
+
+            }
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        else
+        {
+
+        }
+    }
+
+    void composeTelemetry() {
+
+        // At the beginning of each telemetry update, grab a bunch of data
+        // from the IMU that we will then display in separate lines.
+        telemetry.addAction(new Runnable() { @Override public void run()
+        {
+            // Acquiring the angles is relatively expensive; we don't want
+            // to do that in each of the three items that need that info, as that's
+            // three times the necessary expense.
+            angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+            gravity  = imu.getGravity();
+        }
+        });
+
+        telemetry.addLine()
+                .addData("status", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getSystemStatus().toShortString();
+                    }
+                })
+                .addData("calib", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getCalibrationStatus().toString();
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("heading", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                    }
+                })
+                .addData("roll", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.secondAngle);
+                    }
+                })
+                .addData("pitch", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.thirdAngle);
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("grvty", new Func<String>() {
+                    @Override public String value() {
+                        return gravity.toString();
+                    }
+                })
+                .addData("mag", new Func<String>() {
+                    @Override public String value() {
+                        return String.format(Locale.getDefault(), "%.3f",
+                                Math.sqrt(gravity.xAccel*gravity.xAccel
+                                        + gravity.yAccel*gravity.yAccel
+                                        + gravity.zAccel*gravity.zAccel));
+                    }
+                });
+    }
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
+
 }
+
