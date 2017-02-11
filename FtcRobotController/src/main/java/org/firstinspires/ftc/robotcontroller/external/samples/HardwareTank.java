@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import org.firstinspires.ftc.robotcontroller.external.samples.MultiplexColorSensor;
 /**
  * This is NOT an opmode.
  *
@@ -32,15 +34,19 @@ public class HardwareTank
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
-    public DcMotor  linearSlide = null;
     public DcMotor  spin1Motor = null;
     public DcMotor  spin2Motor = null;
     public DcMotor  flyWheelMotor1 = null;
     public DcMotor  flyWheelMotor2 = null;
+    public DcMotor linearSlideMotor1 = null;
+    public DcMotor linearSlideMotor2 = null;
     public Servo    beaconServo = null;
     public Servo    flagServo = null;
+    public Servo    capBallServo1 = null;
+    public Servo    capBallServo2 = null;
     public DeviceInterfaceModule device = null;
     public ColorSensor colourSensor = null;
+    public OpticalDistanceSensor ods = null;
     public final double distancePerRev = 18.84;
     public final double ticksPerInch = 53.4776;
     public double leftDrivePower;       //power level for left side drive train motor
@@ -56,8 +62,11 @@ public class HardwareTank
                                         //should be less than one rotation right?
     public int ledChannel = 5;
 
-    public double minBangValue = 0;// for bangbang for the flywheels
-    public double maxBangValue = 1; // for bangbang for the flywheels
+    public double minBangValue = .3;// for bangbang for the flywheels
+    public double maxBangValue = .45; // for bangbang for the flywheels
+
+    public MultiplexColorSensor muxColor;
+    public int[] ports = {0, 1};
 
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
@@ -91,6 +100,21 @@ public class HardwareTank
         flyWheelMotor1.setDirection(DcMotor.Direction.REVERSE);
         device = hwMap.deviceInterfaceModule.get("deviceINT");
         colourSensor = hwMap.colorSensor.get("colour_sensor");
+        ods = hwMap.opticalDistanceSensor.get("ods");
+
+        capBallServo1 = hwMap.servo.get("cap1");
+        capBallServo2 = hwMap.servo.get("cap2");
+
+        linearSlideMotor1 = hwMap.dcMotor.get("linear1");
+        linearSlideMotor2 = hwMap.dcMotor.get("linear2");
+        linearSlideMotor1.setDirection(DcMotor.Direction.FORWARD);
+        linearSlideMotor2.setDirection(DcMotor.Direction.REVERSE);
+
+        int milliSeconds = 48;
+        muxColor = new MultiplexColorSensor(hwMap, "mux", "ada",
+                ports, milliSeconds,
+                MultiplexColorSensor.GAIN_16X);
+
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -98,9 +122,16 @@ public class HardwareTank
         spin2Motor.setPower(0);
         flyWheelMotor1.setPower(0);
         flyWheelMotor2.setPower(0);
+        linearSlideMotor1.setPower(0);
+        linearSlideMotor2.setPower(0);
 
-        flyWheelMotor1.setMaxSpeed(1200);
-        flyWheelMotor2.setMaxSpeed(1200);
+
+
+        capBallServo1.setPosition(0);
+        capBallServo2.setPosition(0);
+
+
+
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -110,12 +141,16 @@ public class HardwareTank
 
     }
 
-
-
     public void driveMotors(double powerLeft, double powerRight)
     {
         leftMotor.setPower(powerLeft);
         rightMotor.setPower(powerRight);
+    }
+
+    public void linearSlideMovement(double power)
+    {
+        linearSlideMotor1.setPower(power);
+        linearSlideMotor2.setPower(power);
     }
 
     /***

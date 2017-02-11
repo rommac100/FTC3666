@@ -98,10 +98,13 @@ public class SensorDiagnostic extends OpMode
 
         robot.flyWheelMotor1.setPower(0);
         robot.flyWheelMotor2.setPower(0);
-        telemetry.addData("Clear", robot.colourSensor.alpha());
-        telemetry.addData("Red  ", robot.colourSensor.red());
-        telemetry.addData("Green", robot.colourSensor.green());
-        telemetry.addData("Blue ", robot.colourSensor.blue());
+        for (int i=0; i<robot.ports.length; i++) {
+            int[] crgb = robot.muxColor.getCRGB(robot.ports[i]);
+
+            telemetry.addLine("Sensor " + robot.ports[i]);
+            telemetry.addData("CRGB", "%5d %5d %5d %5d",
+                    crgb[0], crgb[1], crgb[2], crgb[3]);
+        }
 
     }
 
@@ -116,6 +119,13 @@ public class SensorDiagnostic extends OpMode
         centerQ= robot.device.getAnalogInputVoltage(0);
         rightQ = robot.device.getAnalogInputVoltage(5);
 
+        for (int i=0; i<robot.ports.length; i++) {
+            int[] crgb = robot.muxColor.getCRGB(robot.ports[i]);
+
+            telemetry.addLine("Sensor " + robot.ports[i]);
+            telemetry.addData("CRGB", "%5d %5d %5d %5d",
+                    crgb[0], crgb[1], crgb[2], crgb[3]);
+        }
 
         telemetry.addData("Left", leftQ);
         telemetry.addData("Right", rightQ);
@@ -126,7 +136,7 @@ public class SensorDiagnostic extends OpMode
         telemetry.addData("Green", robot.colourSensor.green());
         telemetry.addData("Blue ", robot.colourSensor.blue());
 
-
+        telemetry.addData("ods Raw Light", robot.ods.getRawLightDetected());
     }
 
     @Override

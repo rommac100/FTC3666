@@ -1,11 +1,27 @@
 [
     {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/pushbotsens.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/pushbotsens.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/preferences.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/xml/preferences.xml"
+    },
+    {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/xml/preferences.xml",
         "source": "/home/rommac100/ftc_app/FtcRobotController/src/main/res/xml/preferences.xml"
     },
     {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/xml/pushbot.xml",
         "source": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/pushbot.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/pushbot.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/pushbot.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/k9usbbot.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/k9usbbot.xml"
     },
     {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/xml/squarebot.xml",
@@ -18,6 +34,18 @@
     {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/xml/device_filter.xml",
         "source": "/home/rommac100/ftc_app/FtcRobotController/src/main/res/xml/device_filter.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/k9legacybot.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/k9legacybot.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/squarebot.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/exploded-aar/FtcCommon-release/res/xml/squarebot.xml"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/xml/device_filter.xml",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/xml/device_filter.xml"
     },
     {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/xml/k9legacybot.xml",

@@ -8,7 +8,19 @@
         "source": "/home/rommac100/ftc_app/FtcRobotController/src/main/res/drawable-xhdpi/icon_robotcontroller.png"
     },
     {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/drawable-xhdpi-v4/icon_menu.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/drawable-xhdpi/icon_menu.png"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/drawable-xhdpi-v4/icon_robotcontroller.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/drawable-xhdpi/icon_robotcontroller.png"
+    },
+    {
         "merged": "/home/rommac100/ftc_app/FtcRobotController/build/intermediates/res/merged/debug/drawable-xhdpi-v4/ic_launcher.png",
         "source": "/home/rommac100/ftc_app/FtcRobotController/src/main/res/drawable-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/build/intermediates/res/merged/debug/drawable-xhdpi-v4/ic_launcher.png",
+        "source": "/home/rommac100/Documents/ftc_app_masterWorking/FtcRobotController/src/main/res/drawable-xhdpi/ic_launcher.png"
     }
 ]

@@ -90,9 +90,6 @@ public class TankTeleop extends LinearOpMode {
         robot.flyWheelMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.flyWheelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         // run until the end of the match (driver presses STOP)
@@ -105,20 +102,7 @@ public class TankTeleop extends LinearOpMode {
             robot.rightDrivePower = gamepad1.right_stick_y;
 
 
-            if(gamepad2.y)
-            {
-                if(robot.linearSlide.getCurrentPosition() < robot.maxSlideHeight)
-                {
-                    robot.linearSlidePower = 0.15;
-                }
-            }
-            else if(gamepad2.a)
-            {
-                if(robot.linearSlide.getCurrentPosition() > 0 )
-                {
-                    robot.linearSlidePower = -0.15;
-                }
-            }
+
 
             /*
             //this part is kinda sketch

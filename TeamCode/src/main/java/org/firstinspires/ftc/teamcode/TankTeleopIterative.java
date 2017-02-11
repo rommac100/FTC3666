@@ -222,6 +222,8 @@ public class TankTeleopIterative extends OpMode
 
 
 
+
+
         //Slowing down speed for the Capturing of Beacons
         if (gamepad2.left_bumper) {
             halfSpeed = .5;
